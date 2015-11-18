@@ -27,7 +27,7 @@
     },
 	"autoload": {
 		"psr-4": {
-			"PCo\\WP\\TRAPP\\": "src/PCo/WP/TRAPP/"
+			"PCo\\WP\\Trapp\\": "src/PCo/WP/Trapp/"
 		}
 	}
 }
