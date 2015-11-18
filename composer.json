@@ -25,10 +25,9 @@
         "issues": "https://github.com/BenjaminMedia/wp-trapp/issues",
         "source": "https://github.com/BenjaminMedia/wp-trapp"
     },
-    "autoload": {
-        "classmap": [
-            "core/",
-            "admin/"
-        ]
-    }
+	"autoload": {
+		"psr-4": {
+			"PCo\\TRAPP\\": "src/PCo/TRAPP/"
+		}
+	}
 }

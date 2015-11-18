@@ -12,7 +12,7 @@
  * Domain Path:       /languages
  */
 
-namespace PCo\Base;
+namespace PCo\TRAPP;
 
 // Do not access this file directly
 if ( !defined( 'ABSPATH' ) ) {
@@ -85,8 +85,10 @@ class Plugin {
 		// Load textdomain
 		load_plugin_textdomain( self::TEXT_DOMAIN, false, dirname( $this->basename ) . '/languages' );
 
-		// Autoload classes
-		require( $this->plugin_dir . 'vendor/autoload.php' );
+		// Autoload classes if not already autoloaded
+		if (file_exists($this->plugin_dir . 'vendor/autoload.php')) {
+			require( $this->plugin_dir . 'vendor/autoload.php' );
+		}
 
 		// Bootstrap
 		$bootstrap = new Core\Bootstrap;
@@ -97,4 +99,4 @@ class Plugin {
 function plugin() {
 	return Plugin::instance();
 }
-//add_action( 'plugins_loaded', __NAMESPACE__ . '\plugin' );
+add_action( 'plugins_loaded', __NAMESPACE__ . '\plugin' );
