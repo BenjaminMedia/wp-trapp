@@ -12,7 +12,7 @@
  * Domain Path:       /languages
  */
 
-namespace PCo\TRAPP;
+namespace PCo\WP\TRAPP;
 
 // Do not access this file directly
 if ( !defined( 'ABSPATH' ) ) {
