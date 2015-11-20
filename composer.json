@@ -27,7 +27,7 @@
     },
 	"autoload": {
 		"psr-4": {
-			"PCo\\WP\\Trapp\\": "src/PCo/WP/Trapp/"
+			"Bonnier\\WP\\Trapp\\": "src/Bonnier/WP/Trapp/"
 		}
 	}
 }
