@@ -19,7 +19,11 @@ class Main
         }
 
         remove_meta_box('ml_box', $post_type, $context);
-        add_meta_box('ml_box', __('Languages','polylang'), [__CLASS__, 'polylang_meta_box_cb'], $post_type, $context, 'high', ['post_type' => $post_type]);
+
+        $args = [
+            'post_type' => $post_type
+        ];
+        add_meta_box('ml_box', __('Languages','polylang'), [__CLASS__, 'polylang_meta_box_cb'], $post_type, $context, 'high', $args);
     }
 
     public static function polylang_meta_box_cb($post, $metabox) {
@@ -58,7 +62,7 @@ class Main
         include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
         include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
 
-        if (get_post_type( $post ) != 'auto-draft' ) {
+        if (get_post_status( $post ) != 'auto-draft' ) {
             include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
         }
     }
