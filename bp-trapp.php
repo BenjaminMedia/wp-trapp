@@ -1,10 +1,8 @@
 <?php
 /**
- * Pco base plugin
+ * BP WP TRAPP Plugin
  *
- * @package Pco Base Plugin
- *
- * Plugin Name:       Pco Base Plugin
+ * Plugin Name:       BP WP TRAPP
  * Plugin URI:        https://github.com/BenjaminMedia/wp-trapp
  * Description:       Send content to the TRAPP translation service.
  * Version:           0.1
@@ -12,10 +10,10 @@
  * Domain Path:       /languages
  */
 
-namespace PCo\WP\Trapp;
+namespace Bonnier\WP\Trapp;
 
 // Do not access this file directly
-if ( !defined( 'ABSPATH' ) ) {
+if (!defined( 'ABSPATH')) {
 	exit;
 }
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace PCo\WP\Trapp\Core;
-use PCo\WP\Trapp\Admin;
-use PCo\WP\Trapp\Frontend;
+namespace Bonnier\WP\Trapp\Core;
+use Bonnier\WP\Trapp\Admin;
+use Bonnier\WP\Trapp\Frontend;
 
 class Bootstrap {
 	public function bootstrap() {
