@@ -2,7 +2,10 @@
 
 namespace Bonnier\WP\Trapp\Admin;
 
-class Main {
+class Main
+{
+    public function bootstrap()
+    {
 
-	public function bootstrap() {}
+    }
 }
