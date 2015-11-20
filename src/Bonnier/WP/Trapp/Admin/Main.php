@@ -40,14 +40,14 @@ class Main
             $lang = $polylang->pref_lang;
         }
 
+        $languages = $polylang->model->get_languages_list();
         $pll_dropdown = new PLL_Walker_Dropdown();
-        $dropdown = $pll_dropdown->walk($polylang->model->get_languages_list(), array(
+        $dropdown = $pll_dropdown->walk($languages, array(
             'name'     => 'post_lang_choice',
             'class'    => 'tags-input',
             'selected' => $lang ? $lang->slug : '',
             'flag'     => true
         ));
-        $languages = $polylang->model->get_languages_list();
 
         foreach ($languages as $key_language => $language ) {
             if ($language->term_id == $lang->term_id) {

@@ -30,10 +30,10 @@
 			} ?>
 
 			<tr>
-				<td class = "pll-language-column"><?php echo $language->flag ? $language->flag : esc_html($language->slug); ?></td>
-				<td class = "hidden"><?php echo $add_link;?></td>
-				<td class = "pll-edit-column"><?php echo $link;?></td>
-				<td class = "pll-translation-column"><?php
+				<td class="pll-language-column"><?php echo $language->flag ? $language->flag : esc_html($language->slug); ?></td>
+				<td class="hidden"><?php echo $add_link;?></td>
+				<td class="pll-edit-column"><?php echo $link;?></td>
+				<td class="pll-translation-column"><?php
 					printf('
 						<input type="hidden" name="post_tr_lang[%1$s]" id="htr_lang_%1$s" value="%2$s"/>
 						<input type="text" class="tr_lang" id="tr_lang_%1$s" value="%3$s">',
