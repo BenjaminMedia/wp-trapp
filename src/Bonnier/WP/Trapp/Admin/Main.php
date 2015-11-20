@@ -1,6 +1,6 @@
 <?php
 
-namespace PCo\WP\Trapp\Admin;
+namespace Bonnier\WP\Trapp\Admin;
 
 class Main {
 
