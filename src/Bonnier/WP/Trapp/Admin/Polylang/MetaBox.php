@@ -9,7 +9,7 @@ use PLL_Walker_Dropdown;
 class MetaBox
 {
 
-    public static function register_meta_box($post_type, $context)
+    public static function registerMetaBox($post_type, $context)
     {
         if ($post_type != 'review' || $context != 'side') {
             return;
@@ -20,10 +20,11 @@ class MetaBox
         $args = [
             'post_type' => $post_type
         ];
-        add_meta_box('ml_box', __('Languages','polylang'), [__CLASS__, 'polylang_meta_box_cb'], $post_type, $context, 'high', $args);
+        add_meta_box('ml_box', __('Languages', Plugin::TEXT_DOMAIN), [__CLASS__, 'polylangMetaBoxRender'], $post_type, $context, 'high', $args);
     }
 
-    public static function polylang_meta_box_cb($post, $metabox) {
+    public static function polylangMetaBoxRender($post, $metabox)
+    {
         global $polylang;
 
         $post_id = $post->ID;
@@ -47,7 +48,7 @@ class MetaBox
             'flag'     => true
         ));
 
-        foreach ($languages as $key_language => $language ) {
+        foreach ($languages as $key_language => $language) {
             if ($language->term_id == $lang->term_id) {
                 unset($languages[ $key_language ]);
                 $languages = array_values($languages);
@@ -57,13 +58,13 @@ class MetaBox
 
         wp_nonce_field('pll_language', '_pll_nonce');
 
-        $is_autopost = (get_post_status( $post ) == 'auto-draft');
+        $is_autopost = (get_post_status($post) == 'auto-draft');
 
-        include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
+        include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
 
         if (!$is_autopost) {
-            include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
-            include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
+            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
+            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
         }
     }
 }

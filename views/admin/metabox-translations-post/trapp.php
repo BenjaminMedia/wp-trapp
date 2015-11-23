@@ -1,5 +1,5 @@
 <div class="form-wrap">
-    <h4><?php _e('TRAPP', $text_domain);?></h4>
+    <h4><?php _e('TRAPP', $text_domain); ?></h4>
 
     <div class="form-field">
         <label for="trapp-comment">
