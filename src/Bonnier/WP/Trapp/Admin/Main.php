@@ -3,6 +3,7 @@
 namespace Bonnier\WP\Trapp\Admin;
 
 use Bonnier\WP\Trapp;
+use Bonnier\WP\Trapp\Plugin;
 use PLL_Walker_Dropdown;
 
 class Main
@@ -40,6 +41,7 @@ class Main
             $lang = $polylang->pref_lang;
         }
 
+        $text_domain = Plugin::TEXT_DOMAIN;
         $languages = $polylang->model->get_languages_list();
         $pll_dropdown = new PLL_Walker_Dropdown();
         $dropdown = $pll_dropdown->walk($languages, array(
