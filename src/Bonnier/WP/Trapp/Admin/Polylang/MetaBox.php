@@ -8,7 +8,14 @@ use PLL_Walker_Dropdown;
 
 class MetaBox
 {
-
+    /**
+     * Registers the Polylang language meta box.
+     *
+     * @param  string $post_type Post type of the post.
+     * @param  string $context   Meta box context.
+     *
+     * @return void
+     */
     public static function registerMetaBox($post_type, $context)
     {
         if ($post_type != 'review' || $context != 'side') {
@@ -23,6 +30,14 @@ class MetaBox
         add_meta_box('ml_box', __('Languages', Plugin::TEXT_DOMAIN), [__CLASS__, 'polylangMetaBoxRender'], $post_type, $context, 'high', $args);
     }
 
+    /**
+     * Registers the Polylang language meta box.
+     *
+     * @param  object $post WP_Post post object.
+     * @param  array  $metabox Array of metabox arguments.
+     *
+     * @return void
+     */
     public static function polylangMetaBoxRender($post, $metabox)
     {
         global $polylang;
