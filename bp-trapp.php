@@ -104,4 +104,4 @@ function instance()
 {
     return Plugin::instance();
 }
-add_action('plugins_loaded', __NAMESPACE__ . '\instance');
+add_action('plugins_loaded', __NAMESPACE__ . '\instance', 0);
