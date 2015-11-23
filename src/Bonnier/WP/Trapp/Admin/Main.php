@@ -61,10 +61,12 @@ class Main
 
         wp_nonce_field('pll_language', '_pll_nonce');
 
-        include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
-        include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
+        $is_autopost = (get_post_status( $post ) == 'auto-draft');
 
-        if (get_post_status( $post ) != 'auto-draft' ) {
+        include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
+
+        if (!$is_autopost) {
+            include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
             include( Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
         }
     }
