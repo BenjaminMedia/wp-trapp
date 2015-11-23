@@ -25,6 +25,7 @@
 			if ($value) {
 				$selected = get_post($value);
 				$app_link = $polylang->filters_post->edit_translation_link($value);
+				// TODO Replace by TRAPP link
 				$trapp_link = sprintf('<a class="button button-primary" href="%1$s">%2$s</a>', esc_url(get_permalink()), __('Edit in TRAPP', $text_domain));
 			} ?>
 
