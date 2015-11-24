@@ -6,7 +6,8 @@
 
         <?php foreach ($languages as $language) : ?>
 
-        <?php
+            <?php
+
 			$value = $polylang->model->get_translation('post', $post_id, $language);
 
             if (!$value || $value == $post_id) { // $value == $post_id happens if the post has been (auto)saved before changing the language
@@ -26,7 +27,7 @@
             if ($value) {
                 $selected = get_post($value);
                 $app_link = $polylang->filters_post->edit_translation_link($value);
-                // TODO Replace by TRAPP link
+                // @TODO Replace by TRAPP link
                 $trapp_link = sprintf('<a class="button button-primary" href="%1$s">%2$s</a>', esc_url(get_permalink()), __('Edit in TRAPP', $text_domain));
             } ?>
 
