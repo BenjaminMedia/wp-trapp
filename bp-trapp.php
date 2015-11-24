@@ -100,8 +100,8 @@ class Plugin
     }
 }
 
-function plugin()
+function instance()
 {
     return Plugin::instance();
 }
-add_action('plugins_loaded', __NAMESPACE__ . '\plugin');
+add_action('plugins_loaded', __NAMESPACE__ . '\instance', 0);
