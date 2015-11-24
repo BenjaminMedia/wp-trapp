@@ -8,7 +8,7 @@
 
             <?php
 
-			$value = $polylang->model->get_translation('post', $post_id, $language);
+            $value = $polylang->model->get_translation('post', $post_id, $language);
 
             if (!$value || $value == $post_id) { // $value == $post_id happens if the post has been (auto)saved before changing the language
                 $value = '';
