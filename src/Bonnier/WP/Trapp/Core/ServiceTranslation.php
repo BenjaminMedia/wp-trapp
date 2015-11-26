@@ -44,7 +44,7 @@ class ServiceTranslation extends Trapp\ServiceTranslation
      *
      * @return string The ServiceTranslation username.
      */
-    protected function getUsername()
+    public function getUsername()
     {
         return apply_filters('bp_trapp_service_username', '');
     }
@@ -54,7 +54,7 @@ class ServiceTranslation extends Trapp\ServiceTranslation
      *
      * @return string The ServiceTranslation secret.
      */
-    protected function getSecret()
+    public function getSecret()
     {
         return apply_filters('bp_trapp_service_secret', '');
     }
