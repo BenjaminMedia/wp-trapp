@@ -30,15 +30,18 @@ class ServiceTranslation extends Trapp\ServiceTranslation
         }
     }
 
-    public function isDevelopment() {
-        return apply_filters('bp_trapp_service_development', false );
+    public function isDevelopment()
+    {
+        return apply_filters('bp_trapp_service_development', false);
     }
 
-    protected function getUsername() {
+    protected function getUsername()
+    {
         return apply_filters('bp_trapp_service_username', '');
     }
 
-    protected function getSecret() {
+    protected function getSecret()
+    {
         return apply_filters('bp_trapp_service_secret', '');
     }
 }

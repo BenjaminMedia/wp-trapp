@@ -20,7 +20,7 @@ class Events
 
     public function editPost()
     {
-        if (!isset($_POST['send_to_trapp'])){
+        if (!isset($_POST['send_to_trapp'])) {
             return;
         }
 
@@ -86,5 +86,4 @@ class Events
     {
         return get_post_meta($this->postId, self::TRAPP_META_KEY, true);
     }
-
 }

@@ -62,7 +62,8 @@ class Main
      *
      * @return void.
      */
-    public static function saveTrapp($postId) {
+    public static function saveTrapp($postId)
+    {
         $events = new Post\Events($postId);
         $events->savePost();
     }
