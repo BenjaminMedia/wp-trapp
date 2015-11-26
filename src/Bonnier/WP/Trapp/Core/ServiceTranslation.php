@@ -6,13 +6,12 @@ use Bonnier\Trapp;
 /**
  * ServiceContent WP class.
  *
- * Initiate Trapp\ServiceTranslation with credentials set from filters.
+ * Initiates Trapp\ServiceTranslation with credentials set from filters.
 */
 class ServiceTranslation extends Trapp\ServiceTranslation
 {
     /**
-     * Initiate IndexSearch\ServiceContent with credentials set from .env
-     * and set development to true if APP_ENV is set to local.
+     * Sets credentials from WP filters.
      */
     public function __construct()
     {
@@ -23,23 +22,38 @@ class ServiceTranslation extends Trapp\ServiceTranslation
             return;
         }
 
-        parent::__construct(WA_INDEXSEARCH_USERNAME, WA_INDEXSEARCH_SECRET);
+        parent::__construct($username, $secret);
 
         if ($this->isDevelopment()) {
             $this->setDevelopment(true);
         }
     }
 
+    /**
+     * Set development on the ServiceTranslation?
+     *
+     * @return boolean.
+     */
     public function isDevelopment()
     {
         return apply_filters('bp_trapp_service_development', false);
     }
 
+    /**
+     * Gets the username for the ServiceTranslation.
+     *
+     * @return string The ServiceTranslation username.
+     */
     protected function getUsername()
     {
         return apply_filters('bp_trapp_service_username', '');
     }
 
+    /**
+     * Gets the secret for the ServiceTranslation.
+     *
+     * @return string The ServiceTranslation secret.
+     */
     protected function getSecret()
     {
         return apply_filters('bp_trapp_service_secret', '');

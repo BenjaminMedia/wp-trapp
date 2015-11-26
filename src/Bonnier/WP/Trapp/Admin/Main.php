@@ -7,7 +7,7 @@ use Bonnier\WP\Trapp\Admin\Post;
 class Main
 {
     /**
-     * Registers init hooks.
+     * Registers admin init hooks.
      *
      * @return void.
      */

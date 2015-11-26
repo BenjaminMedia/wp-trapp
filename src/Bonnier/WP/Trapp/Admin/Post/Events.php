@@ -7,17 +7,41 @@ use Bonnier\WP\Trapp\Core\ServiceTranslation;
 
 class Events
 {
+    /**
+     * The Trapp id meta key.
+     */
     const TRAPP_META_KEY = 'bp_trapp_id';
 
-    public $postId = false;
-    public $trappId = false;
+    /**
+     * ID of the saved post.
+     *
+     * @var integer.
+     */
+    public $postId = 0;
 
+    /**
+     * Trapp ID of the saved post.
+     *
+     * @var integer.
+     */
+    public $trappId = 0;
+
+    /**
+     * Sets post and Trapp Id to the object.
+     *
+     * @return void.
+     */
     public function __construct($postId)
     {
         $this->postId = $postId;
         $this->trappId = $this->getTrappId();
     }
 
+    /**
+     * Validates the send_to_trapp request.
+     *
+     * @return void.
+     */
     public function editPost()
     {
         if (!isset($_POST['send_to_trapp'])) {
@@ -54,6 +78,11 @@ class Events
         do_action('bp_save_trapp', $this->postId);
     }
 
+    /**
+     * Create or update a new Trapp revision.
+     *
+     * @return void.
+     */
     public function savePost()
     {
         if ($this->hasTrappId()) {
@@ -63,16 +92,31 @@ class Events
         }
     }
 
+    /**
+     * Creates a new Trapp revision.
+     *
+     * @return void.
+     */
     public function createTrappRevision()
     {
         $service = new ServiceTranslation;
     }
 
+    /**
+     * Updates an exiting Trapp entry with a new Trapp revision.
+     *
+     * @return void.
+     */
     public function updateTrappRevision()
     {
         $service = new ServiceTranslation;
     }
 
+    /**
+     * Validates if a trappId is found.
+     *
+     * @return boolean.
+     */
     public function hasTrappId()
     {
         if ($this->trappId) {
@@ -82,6 +126,11 @@ class Events
         return false;
     }
 
+    /**
+     * Fetches the Trapp id meta from the post.
+     *
+     * @return string.
+     */
     public function getTrappId()
     {
         return get_post_meta($this->postId, self::TRAPP_META_KEY, true);
