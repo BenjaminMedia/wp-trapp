@@ -103,7 +103,7 @@ class Events
     }
 
     /**
-     * Updates an exiting Trapp entry with a new Trapp revision.
+     * Updates an exiting Trapp entry with a new revision.
      *
      * @return void.
      */
