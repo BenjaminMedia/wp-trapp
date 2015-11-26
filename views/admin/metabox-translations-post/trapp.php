@@ -21,7 +21,9 @@
             <strong><?php _e('Begin translation right away', $text_domain); ?></strong>
         </label>
         <p class="description">
-            <?php _e('By checking this box and pressing "Send to translation" you are telling translators in TRAPP not to wait. Sometimes you might want to copy+paste already translated PDF-material into articles that are sent to TRAPP, if so, then uncheck this box and press "Send to translation"."', $text_domain)); ?>
+            <?php _e('By checking this box and pressing "Send to translation" you are telling translators in TRAPP not to wait.', $text_domain); ?>
+            <br>
+            <?php _e('Sometimes you might want to copy+paste already translated PDF-material into articles that are sent to TRAPP, if so, then uncheck this box and press "Send to translation".', $text_domain); ?>
         </p>
     </div>
 
