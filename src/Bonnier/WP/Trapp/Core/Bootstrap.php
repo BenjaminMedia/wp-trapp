@@ -31,6 +31,8 @@ class Bootstrap
     {
         add_filter('bp_trapp_service_username', [__CLASS__, 'serviceUser']);
         add_filter('bp_trapp_service_secret', [__CLASS__, 'serviceSecret']);
+        add_filter('bp_trapp_save_app_code', [__CLASS__, 'saveAppCode']);
+        add_filter('bp_trapp_save_brand_code', [__CLASS__, 'saveBrandCode']);
     }
 
     /**
@@ -52,9 +54,9 @@ class Bootstrap
     /**
      * Read the Trapp secret from the constant 'WA_TRAPP_SECRET'.
      *
-     * @param  string $user The Trapp secret.
+     * @param  string $secret The Trapp secret.
      *
-     * @return string $user.
+     * @return string $secret.
      */
     public static function serviceSecret($secret)
     {
@@ -63,5 +65,37 @@ class Bootstrap
         }
 
         return $secret;
+    }
+
+    /**
+     * Read the Trapp app code from the constant 'WA_APP_CODE'.
+     *
+     * @param  string $app_code The Trapp app code.
+     *
+     * @return string $app_code.
+     */
+    public static function saveAppCode($app_code)
+    {
+        if (defined('WA_APP_CODE')) {
+            return WA_APP_CODE;
+        }
+
+        return $app_code;
+    }
+
+    /**
+     * Read the Trapp brand code from the constant 'WA_BRAND_CODE'.
+     *
+     * @param  string $brand_code The Trapp brand code.
+     *
+     * @return string $brand_code.
+     */
+    public static function saveBrandCode($brand_code)
+    {
+        if (defined('WA_BRAND_CODE')) {
+            return WA_BRAND_CODE;
+        }
+
+        return $brand_code;
     }
 }
