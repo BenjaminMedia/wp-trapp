@@ -27,13 +27,21 @@ class Events
     public $trappId = 0;
 
     /**
+     * WP_Post object of the saved post.
+     *
+     * @var object.
+     */
+    public $post;
+
+    /**
      * Sets post and Trapp Id to the object.
      *
      * @return void.
      */
-    public function __construct($postId)
+    public function __construct($postId, $post)
     {
         $this->postId = $postId;
+        $this->post = $post;
         $this->trappId = $this->getTrappId();
     }
 
@@ -68,14 +76,14 @@ class Events
          *
          * @param int     $postId  Post ID.
          */
-        do_action('bp_save_trapp_' . $post_type, $this->postId);
+        do_action('bp_save_trapp_' . $post_type, $this->postId, $this->post);
 
         /**
          * Fired once a post with a TRAPP action has been saved.
          *
          * @param int     $postId  Post ID.
          */
-        do_action('bp_save_trapp', $this->postId);
+        do_action('bp_save_trapp', $this->postId, $this->post);
     }
 
     /**
@@ -99,7 +107,58 @@ class Events
      */
     public function createTrappRevision()
     {
-        $service = new ServiceTranslation;
+        global $polylang;
+
+        $translation = new ServiceTranslation;
+
+        // TODO Use posted date
+        $deadline = new \DateTime();
+        $deadline->add(new \DateInterval('P10D'));
+
+        $translation->setDeadline($deadline);
+        $translation->setLocale($this->getPostLocale());
+        $translation->setTitle($this->post->post_title);
+
+        // Create new revision
+        $revision = new \Bonnier\Trapp\Translation\TranslationRevision();
+
+        $title = new \Bonnier\Trapp\Translation\TranslationField('Title', $this->post->post_title);
+        $title->setGroup('Post');
+        $revision->addField($title);
+
+        $post_name = new \Bonnier\Trapp\Translation\TranslationField('Name/Slug', $this->post->post_name);
+        $post_name->setGroup('Post');
+        $revision->addField($post_name);
+
+        $content = new \Bonnier\Trapp\Translation\TranslationField('Body', $this->post->post_content);
+        $content->setGroup('Post');
+        $revision->addField($content);
+
+        $translation->addRevision($revision);
+
+        if (!empty($_POST['trapp_tr_lang'])) {
+            foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
+                $trapp_lang = esc_attr($trapp_lang);
+                $trapp_lang = $polylang->model->get_language($trapp_lang);
+
+                if (!$trapp_lang) {
+                    continue;
+                }
+
+                $locale = $this->filterLocale($trapp_lang->locale);
+                $translation->addLanguage($locale);
+            }
+        }
+
+        $translation->save();
+
+        // Get row data after data
+        $row = $translation->getRow();
+
+        // Save index search id
+        add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
+
+        do_action('bp_trapp_after_save_post', $row, $this->post);
     }
 
     /**
@@ -134,5 +193,20 @@ class Events
     public function getTrappId()
     {
         return get_post_meta($this->postId, self::TRAPP_META_KEY, true);
+    }
+
+    public function getPostLocale() {
+        $locale = pll_get_post_language($this->postId, 'locale');
+        $locale = $this->filterLocale($locale);
+
+        return $locale;
+    }
+
+    public function filterLocale($locale) {
+        if ($locale == 'fi') {
+            $locale = 'fi_fi';
+        }
+
+        return strtolower($locale);
     }
 }
