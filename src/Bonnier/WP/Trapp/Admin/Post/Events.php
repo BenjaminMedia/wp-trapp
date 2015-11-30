@@ -109,6 +109,10 @@ class Events
     {
         global $polylang;
 
+        if (empty($_POST['trapp_tr_lang'])) {
+            return;
+        }
+
         $translation = new ServiceTranslation;
 
         // TODO Use posted date
@@ -122,32 +126,36 @@ class Events
         // Create new revision
         $revision = new \Bonnier\Trapp\Translation\TranslationRevision();
 
+        if (isset($_POST['trapp_start'])) {
+            $revision->setState('state-missing');
+        }
+
+        $post_group = apply_filters( 'bp_trapp_post_group', 'Post', $this->postId, $this->post );
+
         $title = new \Bonnier\Trapp\Translation\TranslationField('Title', $this->post->post_title);
-        $title->setGroup('Post');
+        $title->setGroup($post_group);
         $revision->addField($title);
 
         $post_name = new \Bonnier\Trapp\Translation\TranslationField('Name/Slug', $this->post->post_name);
-        $post_name->setGroup('Post');
+        $post_name->setGroup($post_group);
         $revision->addField($post_name);
 
         $content = new \Bonnier\Trapp\Translation\TranslationField('Body', $this->post->post_content);
-        $content->setGroup('Post');
+        $content->setGroup($post_group);
         $revision->addField($content);
 
         $translation->addRevision($revision);
 
-        if (!empty($_POST['trapp_tr_lang'])) {
-            foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
-                $trapp_lang = esc_attr($trapp_lang);
-                $trapp_lang = $polylang->model->get_language($trapp_lang);
+        foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
+            $trapp_lang = esc_attr($trapp_lang);
+            $trapp_lang = $polylang->model->get_language($trapp_lang);
 
-                if (!$trapp_lang) {
-                    continue;
-                }
-
-                $locale = $this->filterLocale($trapp_lang->locale);
-                $translation->addLanguage($locale);
+            if (!$trapp_lang) {
+                continue;
             }
+
+            $locale = $this->filterLocale($trapp_lang->locale);
+            $translation->addLanguage($locale);
         }
 
         $translation->save();
