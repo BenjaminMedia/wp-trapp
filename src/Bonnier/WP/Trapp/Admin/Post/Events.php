@@ -138,7 +138,7 @@ class Events
         }
 
         if (!empty($_POST['trapp_comment'])) {
-            $translation->setComment(esc_attr( $_POST['trapp_comment'] ));
+            $translation->setComment(esc_attr($_POST['trapp_comment']));
         }
 
         $post_group = apply_filters('bp_trapp_post_group', 'Post', $this->postId, $this->post);
