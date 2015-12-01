@@ -16,10 +16,10 @@ class Main
         // Register own actions
         add_action('pll_init', [__CLASS__, 'polylangInit']);
         add_action('bp_pll_init', [__CLASS__, 'bpPllInit']);
-        add_action('edit_post', [__CLASS__, 'editPost']);
+        add_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
 
         // Hook into plugin actions
-        add_action('bp_save_trapp', [__CLASS__, 'saveTrapp']);
+        add_action('bp_save_trapp', [__CLASS__, 'saveTrapp'], 10, 2);
     }
 
     /**
@@ -49,9 +49,9 @@ class Main
      *
      * @return void.
      */
-    public static function editPost($postId)
+    public static function editPost($postId, $post)
     {
-        $events = new Post\Events($postId);
+        $events = new Post\Events($postId, $post);
         $events->editPost();
     }
 
@@ -62,9 +62,9 @@ class Main
      *
      * @return void.
      */
-    public static function saveTrapp($postId)
+    public static function saveTrapp($postId, $post)
     {
-        $events = new Post\Events($postId);
+        $events = new Post\Events($postId, $post);
         $events->savePost();
     }
 

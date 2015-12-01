@@ -14,7 +14,7 @@ class MetaBox
      * @param  string $post_type Post type of the post.
      * @param  string $context   Meta box context.
      *
-     * @return void
+     * @return void.
      */
     public static function registerMetaBox($post_type, $context)
     {
@@ -28,6 +28,7 @@ class MetaBox
             'post_type' => $post_type
         ];
         add_meta_box('ml_box', __('Languages', Plugin::TEXT_DOMAIN), [__CLASS__, 'polylangMetaBoxRender'], $post_type, $context, 'high', $args);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueDatePicker']);
     }
 
     /**
@@ -36,7 +37,7 @@ class MetaBox
      * @param  object $post WP_Post post object.
      * @param  array  $metabox Array of metabox arguments.
      *
-     * @return void
+     * @return void.
      */
     public static function polylangMetaBoxRender($post, $metabox)
     {
@@ -81,5 +82,24 @@ class MetaBox
             include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
             include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
         }
+    }
+
+    /**
+     * Registers datepicker for the deadline field.
+     *
+     * @return void.
+     */
+    public static function enqueueDatePicker()
+    {
+        $script_src = Trapp\instance()->plugin_url . 'js/bp-trapp-datepicker.js';
+        $style_src = Trapp\instance()->plugin_url . 'css/bp-trapp-datepicker.css';
+        $deps = [
+            'jquery',
+            'jquery-ui-core',
+            'jquery-ui-datepicker'
+        ];
+
+        wp_enqueue_script('bp-trapp-datepicker', $script_src, $deps);
+        wp_enqueue_style('bp-trapp-datepicker', $style_src);
     }
 }

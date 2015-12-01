@@ -5,19 +5,19 @@
         <label for="trapp-comment">
             <strong><?php _e('Comment:', $text_domain); ?></strong>
         </label>
-        <textarea name="trapp_comment" id="trapp-comment"></textarea>
+        <input type="text" name="trapp_comment" id="trapp-comment" name="trapp_comment">
     </div>
 
     <div class="form-field">
         <label for="trapp-deadline">
             <strong><?php _e('Deadline:', $text_domain); ?></strong>
         </label>
-        <input type="text" id="trapp-deadline" value="<?php echo date('Y-m-d', current_time('timestamp')); ?>">
+        <input type="text" id="trapp-deadline" name="trapp_deadline" value="<?php echo date('Y-m-d', current_time('timestamp')); ?>">
     </div>
 
     <div class="form-field">
         <label for="trapp-start">
-            <input type="checkbox" id="trapp-start" value="1">
+            <input type="checkbox" id="trapp-start" name="trapp_start" value="1">
             <strong><?php _e('Begin translation right away', $text_domain); ?></strong>
         </label>
         <p class="description">

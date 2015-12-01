@@ -30,6 +30,19 @@ class ServiceTranslation extends Trapp\ServiceTranslation
     }
 
     /**
+     * Saves item
+     *
+     * @return static
+     */
+    public function save()
+    {
+        $this->app_code = $this->getAppCode();
+        $this->brand_code = $this->getBrandCode();
+
+        return parent::save();
+    }
+
+    /**
      * Set development on the ServiceTranslation?
      *
      * @return boolean.
@@ -57,5 +70,25 @@ class ServiceTranslation extends Trapp\ServiceTranslation
     public function getSecret()
     {
         return apply_filters('bp_trapp_service_secret', '');
+    }
+
+    /**
+     * Gets the secret for the ServiceTranslation.
+     *
+     * @return string The ServiceTranslation secret.
+     */
+    public function getAppCode()
+    {
+        return apply_filters('bp_trapp_save_app_code', '');
+    }
+
+    /**
+     * Gets the secret for the ServiceTranslation.
+     *
+     * @return string The ServiceTranslation secret.
+     */
+    public function getBrandCode()
+    {
+        return apply_filters('bp_trapp_save_brand_code', '');
     }
 }

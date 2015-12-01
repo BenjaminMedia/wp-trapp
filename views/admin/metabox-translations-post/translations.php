@@ -37,10 +37,9 @@
 
                     <td class="pll-language-column"><?php
                     printf('
-                        <input type="hidden" name="post_tr_lang[%1$s]" id="htr_lang_%1$s" value="%2$s"/>
-                        <input type="checkbox" name="trapp_tr_lang[%1$s]" id="htrapp_lang_%1$s" value="%2$s" %3$s />',
+                        <input type="hidden" name="post_tr_lang[%1$s]" id="htr_lang_%1$s" value="1"/>
+                        <input type="checkbox" name="trapp_tr_lang[%1$s]" id="htrapp_lang_%1$s" value="1" %2$s />',
                         esc_attr($language->slug),
-                        empty($value) ? 0 : esc_attr($selected->ID),
                         checked(!empty($value), true, false)
                     ); ?>
                     </td>
