@@ -5,7 +5,7 @@
         <label for="trapp-comment">
             <strong><?php _e('Comment:', $text_domain); ?></strong>
         </label>
-        <textarea name="trapp_comment" id="trapp-comment" name="trapp_comment"></textarea>
+        <input type="text" name="trapp_comment" id="trapp-comment" name="trapp_comment">
     </div>
 
     <div class="form-field">
