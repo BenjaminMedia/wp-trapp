@@ -28,7 +28,7 @@ class MetaBox
             'post_type' => $post_type
         ];
         add_meta_box('ml_box', __('Languages', Plugin::TEXT_DOMAIN), [__CLASS__, 'polylangMetaBoxRender'], $post_type, $context, 'high', $args);
-        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueue_date_picker']);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueDatePicker']);
     }
 
     /**
@@ -89,7 +89,8 @@ class MetaBox
      *
      * @return void.
      */
-    public static function enqueue_date_picker() {
+    public static function enqueueDatePicker()
+    {
         $script_src = Trapp\instance()->plugin_url . 'js/bp-trapp-datepicker.js';
         $style_src = Trapp\instance()->plugin_url . 'css/bp-trapp-datepicker.css';
         $deps = [
@@ -98,7 +99,7 @@ class MetaBox
             'jquery-ui-datepicker'
         ];
 
-        wp_enqueue_script('bp-trapp-datepicker', $script_src, $deps );
-        wp_enqueue_style( 'bp-trapp-datepicker', $style_src );
+        wp_enqueue_script('bp-trapp-datepicker', $script_src, $deps);
+        wp_enqueue_style('bp-trapp-datepicker', $style_src);
     }
 }

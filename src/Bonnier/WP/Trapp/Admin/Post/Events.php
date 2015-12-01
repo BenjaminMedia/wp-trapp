@@ -138,10 +138,10 @@ class Events
 
         if (!empty($_POST['trapp_comment'])) {
             #$revision->setComment(esc_textarea( $_POST['trapp_comment'] ));
-            $translation->comment = esc_textarea( $_POST['trapp_comment'] );
+            $translation->comment = esc_textarea($_POST['trapp_comment']);
         }
 
-        $post_group = apply_filters( 'bp_trapp_post_group', 'Post', $this->postId, $this->post );
+        $post_group = apply_filters('bp_trapp_post_group', 'Post', $this->postId, $this->post);
 
         $title = new \Bonnier\Trapp\Translation\TranslationField('Title', $this->post->post_title);
         $title->setGroup($post_group);
@@ -214,14 +214,16 @@ class Events
         return get_post_meta($this->postId, self::TRAPP_META_KEY, true);
     }
 
-    public function getPostLocale() {
+    public function getPostLocale()
+    {
         $locale = pll_get_post_language($this->postId, 'locale');
         $locale = $this->filterLocale($locale);
 
         return $locale;
     }
 
-    public function filterLocale($locale) {
+    public function filterLocale($locale)
+    {
         if ($locale == 'fi') {
             $locale = 'fi_fi';
         }
