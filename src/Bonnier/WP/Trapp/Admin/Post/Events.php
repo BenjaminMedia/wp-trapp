@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Post;
 
 use Bonnier\WP\Trapp\Plugin;
 use Bonnier\WP\Trapp\Core\ServiceTranslation;
+use DateTime;
 
 class Events
 {
@@ -113,11 +114,15 @@ class Events
             return;
         }
 
+        if (empty($_POST['trapp_deadline'])) {
+            return;
+        }
+
         $translation = new ServiceTranslation;
 
         // TODO Use posted date
-        $deadline = new \DateTime();
-        $deadline->add(new \DateInterval('P10D'));
+        $deadline = esc_attr($_POST['trapp_deadline']);
+        $deadline = new DateTime($deadline);
 
         $translation->setDeadline($deadline);
         $translation->setLocale($this->getPostLocale());
@@ -131,7 +136,7 @@ class Events
             $translation->state = 'state-missing';
         }
 
-        if (isset($_POST['trapp_comment'])) {
+        if (!empty($_POST['trapp_comment'])) {
             #$revision->setComment(esc_textarea( $_POST['trapp_comment'] ));
             $translation->comment = esc_textarea( $_POST['trapp_comment'] );
         }
