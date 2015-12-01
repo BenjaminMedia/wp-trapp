@@ -127,7 +127,13 @@ class Events
         $revision = new \Bonnier\Trapp\Translation\TranslationRevision();
 
         if (isset($_POST['trapp_start'])) {
-            $revision->setState('state-missing');
+            #$revision->setState('state-missing');
+            $translation->state = 'state-missing';
+        }
+
+        if (isset($_POST['trapp_comment'])) {
+            #$revision->setComment(esc_textarea( $_POST['trapp_comment'] ));
+            $translation->comment = esc_textarea( $_POST['trapp_comment'] );
         }
 
         $post_group = apply_filters( 'bp_trapp_post_group', 'Post', $this->postId, $this->post );
