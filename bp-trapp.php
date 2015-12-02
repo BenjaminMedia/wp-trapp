@@ -105,3 +105,16 @@ function instance()
     return Plugin::instance();
 }
 add_action('plugins_loaded', __NAMESPACE__ . '\instance', 0);
+
+// How to set development true? Possible create a small plugin for this filter
+add_filter('bp_trapp_service_development', function($is_development) {
+    if (!defined('APP_ENV')) {
+        return $is_development;
+    }
+
+    if (APP_ENV == 'production') {
+        return false;
+    }
+
+    return true;
+});
