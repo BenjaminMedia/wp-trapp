@@ -65,8 +65,6 @@ class Events
     {
         global $polylang;
 
-        // Create post possible save data from master hook and scheduled data via. hook.
-
         $translations = $polylang->model->get_translations('post', $this->post->ID );
 
         foreach ($this->rowTranslations as $locale => $id) {
@@ -91,6 +89,7 @@ class Events
         }
 
         pll_save_post_translations($translations);
+        // Think we have to remove polylang save actions
     }
 
 }
