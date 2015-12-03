@@ -16,6 +16,11 @@ class Events
     const TRAPP_META_KEY = 'bp_trapp_id';
 
     /**
+     * The Trapp id meta key.
+     */
+    const TRAPP_META_MASTER = 'bp_trapp_master';
+
+    /**
      * ID of the saved post.
      *
      * @var integer.
@@ -96,7 +101,7 @@ class Events
      */
     public function savePost()
     {
-        if ($this->hasTrappId()) {
+        if ($this->hasTrappId()) {ddd($this->getTrappId());
             $this->updateTrappRevision();
         } else {
             $this->createTrappRevision();
@@ -122,7 +127,6 @@ class Events
 
         $translation = new ServiceTranslation;
 
-        // TODO Use posted date
         $deadline = esc_attr($_POST['trapp_deadline']);
         $deadline = new DateTime($deadline);
 
@@ -174,8 +178,15 @@ class Events
         // Get row data after data
         $row = $translation->getRow();
 
-        // Save index search id
+
+#        $row = get_option('testrow');
+#        ddd($row);
+
+        // Save Trapp id
         add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
+
+        // This is the first saved post and therefore master
+        add_post_meta($this->postId, self::TRAPP_META_MASTER, 1);
 
         do_action('bp_trapp_after_save_post', $row, $this->post);
     }
