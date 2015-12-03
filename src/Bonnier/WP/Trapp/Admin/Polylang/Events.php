@@ -3,6 +3,7 @@
 namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Admin\Post;
 
 class Events
 {
@@ -62,22 +63,34 @@ class Events
      */
     public function saveLanguages()
     {
-        // TODO Find current pll translations and append the rowtranslations
-        // If the Post does not already exist, create it
+        global $polylang;
+
         // Create post possible save data from master hook and scheduled data via. hook.
-        foreach ($this->row->translations as $translation) {
-            $this->saveLanguage($translation);
+
+        $translations = $polylang->model->get_translations('post', $this->post->ID );
+
+        foreach ($this->rowTranslations as $locale => $id) {
+            // Polylang is using the slug to set post languages
+            $language_slug = current(explode('_', $locale));
+
+            if (!array_key_exists($language_slug, $translations)) {
+                $lang_post_args = apply_filters('bp_trapp_save_language_post_args', [
+                    'post_title' => '',
+                    'post_content' => '',
+                    'post_type' => $this->post->post_type,
+                ], $this->post, $language_slug);
+
+                $lang_post_id = wp_insert_post($lang_post_args);
+                pll_set_post_language($lang_post_id, $language_slug);
+
+                $translations[$language_slug] = $lang_post_id;
+            }
+
+            // Update the meta key
+            update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_KEY, $id);
         }
 
-        $this->savePostLanguages();
-    }
-
-    public function saveLanguage($translation) {
-
-    }
-
-    public function savePostLanguages() {
-
+        pll_save_post_translations($translations);
     }
 
 }
