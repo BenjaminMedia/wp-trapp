@@ -195,6 +195,7 @@ class Events
      */
     public function updateTrappRevision()
     {
+        // TODO Reminds alot of the insert flow so maybe merge into a common method
         global $polylang;
 
         if (empty($_POST['trapp_tr_lang'])) {
