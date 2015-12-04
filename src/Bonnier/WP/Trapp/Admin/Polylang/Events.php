@@ -90,8 +90,5 @@ class Events
         }
 
         pll_save_post_translations($translations);
-
-        // We will handle the translations instead of Polylang
-        remove_action('save_post', array($polylang->filters_post, 'save_post'), 21, 3);
     }
 }
