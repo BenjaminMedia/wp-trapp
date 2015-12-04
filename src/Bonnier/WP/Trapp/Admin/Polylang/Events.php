@@ -47,7 +47,8 @@ class Events
      *
      * @return void.
      */
-    public function setRowTranslations() {
+    public function setRowTranslations()
+    {
         foreach ($this->row->translations as $translation) {
             $id = $translation['id'];
             $locale = $translation['locale'];
@@ -65,7 +66,7 @@ class Events
     {
         global $polylang;
 
-        $translations = $polylang->model->get_translations('post', $this->post->ID );
+        $translations = $polylang->model->get_translations('post', $this->post->ID);
 
         foreach ($this->rowTranslations as $locale => $id) {
             // Polylang is using the slug to set post languages
@@ -93,5 +94,4 @@ class Events
         // We will handle the translations instead of Polylang
         remove_action('save_post', array($polylang->filters_post, 'save_post'), 21, 3);
     }
-
 }

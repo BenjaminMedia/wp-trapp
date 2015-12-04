@@ -101,7 +101,7 @@ class Events
      */
     public function savePost()
     {
-        if ($this->hasTrappId()) {ddd($this->getTrappId());
+        if ($this->hasTrappId()) {
             $this->updateTrappRevision();
         } else {
             $this->createTrappRevision();
