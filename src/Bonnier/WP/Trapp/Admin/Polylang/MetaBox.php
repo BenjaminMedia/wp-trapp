@@ -92,7 +92,7 @@ class MetaBox
                     $deadline = date('Y-m-d', current_time('timestamp'));
                 }
 
-                include(self::getView('sadmin/metabox-translations-post/trapp.php'));
+                include(self::getView('admin/metabox-translations-post/trapp.php'));
             }
         }
     }
