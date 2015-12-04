@@ -16,9 +16,14 @@ class Events
     const TRAPP_META_KEY = 'bp_trapp_id';
 
     /**
-     * The Trapp id meta key.
+     * The Trapp master meta key.
      */
     const TRAPP_META_MASTER = 'bp_trapp_master';
+
+    /**
+     * The Trapp deadline meta key.
+     */
+    const TRAPP_META_DEADLINE = 'bp_trapp_deadline';
 
     /**
      * ID of the saved post.
@@ -128,6 +133,8 @@ class Events
         $translation = new ServiceTranslation;
 
         $deadline = esc_attr($_POST['trapp_deadline']);
+        add_post_meta($this->post->ID, self::TRAPP_META_DEADLINE, $deadline);
+
         $deadline = new DateTime($deadline);
 
         $translation->setDeadline($deadline);
@@ -208,8 +215,9 @@ class Events
 
         if (!empty($_POST['trapp_deadline'])) {
             $deadline = esc_attr($_POST['trapp_deadline']);
-            $deadline = new DateTime($deadline);
+            update_post_meta($this->post->ID, self::TRAPP_META_DEADLINE, $deadline);
 
+            $deadline = new DateTime($deadline);
             $translation->setDeadline($deadline);
         }
 
