@@ -26,6 +26,11 @@ class Events
     const TRAPP_META_DEADLINE = 'bp_trapp_deadline';
 
     /**
+     * The Trapp link meta key.
+     */
+    const TRAPP_META_LINK = 'bp_trapp_link';
+
+    /**
      * ID of the saved post.
      *
      * @var integer.

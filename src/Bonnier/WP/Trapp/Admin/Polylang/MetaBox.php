@@ -96,6 +96,7 @@ class MetaBox
         $is_autopost = (get_post_status($post) == 'auto-draft');
         $is_master = get_post_meta($post->ID, Events::TRAPP_META_MASTER, true);
         $has_trapp_key = get_post_meta($post->ID, Events::TRAPP_META_KEY, true);
+        $trapp_link_key = Events::TRAPP_META_LINK;
 
         if ($is_autopost) {
             include(self::getView('admin/metabox-translations-post/language.php'));
