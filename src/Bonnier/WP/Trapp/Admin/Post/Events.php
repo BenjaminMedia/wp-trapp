@@ -178,10 +178,6 @@ class Events
         // Get row data after data
         $row = $translation->getRow();
 
-
-#        $row = get_option('testrow');
-#        ddd($row);
-
         // Save Trapp id
         add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
 
