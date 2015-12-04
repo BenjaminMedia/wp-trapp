@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp;
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Admin\Post\Events;
 use PLL_Walker_Dropdown;
 
 class MetaBox
@@ -75,12 +76,23 @@ class MetaBox
         wp_nonce_field('pll_language', '_pll_nonce');
 
         $is_autopost = (get_post_status($post) == 'auto-draft');
+        $is_master = get_post_meta($post->ID, Events::TRAPP_META_MASTER, true);
+        $has_trapp_key = get_post_meta($post->ID, Events::TRAPP_META_KEY, true);
 
-        include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
-
-        if (!$is_autopost) {
+        if ($is_autopost) {
+            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
+        } else {
             include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
-            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
+
+            if ($is_master || !$has_trapp_key) {
+                $deadline = get_post_meta($post->ID, Events::TRAPP_META_DEADLINE, true);
+
+                if (empty($deadline)) {
+                    $deadline = date('Y-m-d', current_time('timestamp'));
+                }
+
+                include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
+            }
         }
     }
 
