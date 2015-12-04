@@ -75,14 +75,15 @@ class MetaBox
 
         wp_nonce_field('pll_language', '_pll_nonce');
 
+        // These shold really exist in some other methods.. whenever the structure has been very defined
         $is_autopost = (get_post_status($post) == 'auto-draft');
         $is_master = get_post_meta($post->ID, Events::TRAPP_META_MASTER, true);
         $has_trapp_key = get_post_meta($post->ID, Events::TRAPP_META_KEY, true);
 
         if ($is_autopost) {
-            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
+            include(self::getView('admin/metabox-translations-post/language.php'));
         } else {
-            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
+            include(self::getView('admin/metabox-translations-post/translations.php'));
 
             if ($is_master || !$has_trapp_key) {
                 $deadline = get_post_meta($post->ID, Events::TRAPP_META_DEADLINE, true);
@@ -91,7 +92,7 @@ class MetaBox
                     $deadline = date('Y-m-d', current_time('timestamp'));
                 }
 
-                include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
+                include(self::getView('sadmin/metabox-translations-post/trapp.php'));
             }
         }
     }
@@ -113,5 +114,18 @@ class MetaBox
 
         wp_enqueue_script('bp-trapp-datepicker', $script_src, $deps);
         wp_enqueue_style('bp-trapp-datepicker', $style_src);
+    }
+
+    /**
+     * Returns view by path.
+     *
+     * @param  string $path Path to the view.
+     *
+     * @return string       Full include path.
+     */
+    public static function getView($path = '') {
+        $dir = Trapp\instance()->plugin_dir . 'views/';
+
+        return $dir . $path;
     }
 }
