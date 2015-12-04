@@ -40,6 +40,8 @@ class Main
     public static function bpPllInit()
     {
         add_action('do_meta_boxes', [__CLASS__, 'polylangMetaBox'], 10, 2);
+        add_action('bp_trapp_after_save_post', [__CLASS__, 'polylangCreateLanguages'], 10, 2);
+        add_filter('bp_trapp_save_language_post_args', [__CLASS__, 'saveLanguagePostArgs'], 10, 2);
     }
 
     /**
@@ -58,7 +60,8 @@ class Main
     /**
      * Hook listener for bp_save_trapp.
      *
-     * @param int $postId Post id of the edited post.
+     * @param int    $postId Post id of the edited post.
+     * @param object $post   WP_Post object of the edited post.
      *
      * @return void.
      */
@@ -80,5 +83,38 @@ class Main
     {
         $pll_meta_box = new Polylang\MetaBox();
         $pll_meta_box->registerMetaBox($post_type, $context);
+    }
+
+    /**
+     * Hook listener for bp_save_trapp when Polylang is active.
+     *
+     * @param object $row  Returned row from Trapp.
+     * @param object $post WP_Post object of the edited post.
+     *
+     * @return void.
+     */
+    public static function polylangCreateLanguages($row, $post)
+    {
+        $events = new Polylang\Events($row, $post);
+        $events->saveLanguages();
+    }
+
+    /**
+     * Filter the new language post args.
+     *
+     * @param array  $args Arguments to be passed to wp_insert_post.
+     * @param object $post WP_Post object of the translated from post.
+     *
+     * @return array $args.
+     */
+    public static function saveLanguagePostArgs($args, $post)
+    {
+        if (get_post_status($post) == 'future') {
+            $args['post_status'] = $post->post_status;
+            $args['post_date'] = $post->post_date;
+            $args['post_date_gmt'] = $post->post_date_gmt;
+        }
+
+        return $args;
     }
 }
