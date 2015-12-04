@@ -20,6 +20,7 @@ class Main
 
         // Hook into plugin actions
         add_action('bp_save_trapp', [__CLASS__, 'saveTrapp'], 10, 2);
+        add_action('edit_post', [__CLASS__, 'removeSavePost']);
     }
 
     /**
@@ -116,5 +117,27 @@ class Main
         }
 
         return $args;
+    }
+
+    /**
+     * Remove Polylang save_post hook if the post does not already have a language.
+     *
+     * @param int $postId Post id of the edited post.
+     *
+     * @return void.
+     */
+    public static function removeSavePost($postId) {
+        if (get_post_status($postId) == 'auto-draft') {
+            return;
+        }
+
+        global $polylang;
+
+        if (!$polylang->model->get_post_language($postId)) {
+            return;
+        }
+
+        // We will handle the translations instead of Polylang
+        remove_action('save_post', array($polylang->filters_post, 'save_post'), 21, 3);
     }
 }
