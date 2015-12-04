@@ -35,14 +35,17 @@
                 <td class="pll-language-column"><?php echo $language->flag ? $language->flag : esc_html($language->slug); ?></td>
                 <td class="hidden"><?php echo $add_link;?></td>
 
+                <?php if ($is_master || !$has_trapp_key) : ?>
                     <td class="pll-language-column"><?php
                     printf('
                         <input type="hidden" name="post_tr_lang[%1$s]" id="htr_lang_%1$s" value="1"/>
-                        <input type="checkbox" name="trapp_tr_lang[%1$s]" id="htrapp_lang_%1$s" value="1" %2$s />',
+                        <input type="checkbox" name="trapp_tr_lang[%1$s]" id="htrapp_lang_%1$s" value="1" %2$s %3$s />',
                         esc_attr($language->slug),
-                        checked(!empty($value), true, false)
+                        checked(!empty($value), true, false),
+                        disabled(!empty($value), true, false)
                     ); ?>
                     </td>
+                <?php endif; ?>
 
                     <?php if ($value) : ?>
                         <td class="pll-edit-column"><?php echo $app_link; ?></td>
