@@ -31,6 +31,8 @@
                 $trapp_link = sprintf('<a class="button button-primary" href="%1$s">%2$s</a>', esc_url(get_permalink()), __('Edit in TRAPP', $text_domain));
             } ?>
 
+            <?php if ($value || $is_master || !$has_trapp_key) : ?>
+
             <tr>
                 <td class="pll-language-column"><?php echo $language->flag ? $language->flag : esc_html($language->slug); ?></td>
                 <td class="hidden"><?php echo $add_link;?></td>
@@ -52,6 +54,8 @@
                         <td class="pll-language-column"><?php echo $trapp_link; ?></td>
                     <?php endif; ?>
             </tr>
+
+            <?php endif; ?>
 
         <?php endforeach; ?>
     </table>

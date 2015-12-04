@@ -65,6 +65,23 @@ class MetaBox
             'flag'     => true
         ));
 
+        $masterLink = '';
+
+        foreach ($languages as $language) {
+            $languagePost = $polylang->model->get_translation('post', $post_id, $language);
+
+            if (!$languagePost) {
+                continue;
+            }
+
+            $languageMasterMeta = get_post_meta($languagePost, Events::TRAPP_META_MASTER, true);
+
+            if ($languageMasterMeta) {
+                $masterLink = sprintf('<a href="%s">%s</a>', get_edit_post_link($languagePost), $language->name);
+                break;
+            }
+        }
+
         foreach ($languages as $key_language => $language) {
             if ($language->term_id == $lang->term_id) {
                 unset($languages[ $key_language ]);
@@ -83,6 +100,12 @@ class MetaBox
         if ($is_autopost) {
             include(self::getView('admin/metabox-translations-post/language.php'));
         } else {
+            include(self::getView('admin/metabox-translations-post/language-edit.php'));
+
+            if (!$is_master) {
+                include(self::getView('admin/metabox-translations-post/language-edit-translation.php'));
+            }
+
             include(self::getView('admin/metabox-translations-post/translations.php'));
 
             if ($is_master || !$has_trapp_key) {
