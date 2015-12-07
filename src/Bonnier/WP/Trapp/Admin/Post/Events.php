@@ -56,10 +56,10 @@ class Events
      *
      * @return void.
      */
-    public function __construct($postId, $post)
+    public function __construct($postId, $post = '')
     {
         $this->postId = $postId;
-        $this->post = $post;
+        $this->post = !empty($post) ? $post : get_post($this->postId);
         $this->trappId = $this->getTrappId();
     }
 
@@ -105,6 +105,41 @@ class Events
     }
 
     /**
+     * Deletes translation from Trapp.
+     *
+     * @return void.
+     */
+    public function deletePost()
+    {
+        // Only the primary post
+        if (wp_is_post_revision($this->postId)) {
+            return;
+        }
+
+        if (!$this->hasTrappId()) {
+            return;
+        }
+
+        $service = new ServiceTranslation;
+// Test delete these
+// Master 56619b7bc01443c03e8b456b
+#56619b7bc01443c03e8b4575
+#56619b7bc01443c03e8b4570
+
+        $translation = $service->getById($this->trappId);
+        #$translation->delete();
+
+        $row = $translation->getRow();
+
+        /**
+         * Fired once a post with a TRAPP id has been deleted.
+         *
+         * @param int     $postId  Post ID.
+         */
+        do_action('bp_delete_trapp', $this->postId, $this->post, $row);
+    }
+
+    /**
      * Create or update a new Trapp revision.
      *
      * @return void.
@@ -138,7 +173,7 @@ class Events
         $translation = new ServiceTranslation;
 
         $deadline = esc_attr($_POST['trapp_deadline']);
-        add_post_meta($this->post->ID, self::TRAPP_META_DEADLINE, $deadline);
+        add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
 
         $deadline = new DateTime($deadline);
 
@@ -220,7 +255,7 @@ class Events
 
         if (!empty($_POST['trapp_deadline'])) {
             $deadline = esc_attr($_POST['trapp_deadline']);
-            update_post_meta($this->post->ID, self::TRAPP_META_DEADLINE, $deadline);
+            update_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
 
             $deadline = new DateTime($deadline);
             $translation->setDeadline($deadline);

@@ -17,6 +17,7 @@ class Main
         add_action('pll_init', [__CLASS__, 'polylangInit']);
         add_action('bp_pll_init', [__CLASS__, 'bpPllInit']);
         add_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
+        add_action('before_delete_post', [__CLASS__, 'deletePost']);
 
         // Hook into plugin actions
         add_action('bp_save_trapp', [__CLASS__, 'saveTrapp'], 10, 2);
@@ -46,7 +47,7 @@ class Main
     }
 
     /**
-     * Hook listener for edit_post.
+     * Hook listener for before.
      *
      * @param int $postId Post id of the edited post.
      *
@@ -56,6 +57,19 @@ class Main
     {
         $events = new Post\Events($postId, $post);
         $events->editPost();
+    }
+
+    /**
+     * Hook listener for before_delete_post.
+     *
+     * @param int $postId Post id of the edited post.
+     *
+     * @return void.
+     */
+    public static function deletePost($postId)
+    {
+        $events = new Post\Events($postId);
+        $events->deletePost();
     }
 
     /**
