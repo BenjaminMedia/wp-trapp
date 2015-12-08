@@ -92,14 +92,16 @@ class Events
          *
          * Specific to the saved post type.
          *
-         * @param int     $postId  Post ID.
+         * @param int    $postId Post ID.
+         * @param object $post   WP_Post object of the saved post.
          */
         do_action('bp_save_trapp_' . $post_type, $this->postId, $this->post);
 
         /**
          * Fired once a post with a TRAPP action has been saved.
          *
-         * @param int     $postId  Post ID.
+         * @param int    $postId Post ID.
+         * @param object $post   WP_Post object of the saved post.
          */
         do_action('bp_save_trapp', $this->postId, $this->post);
     }
@@ -134,9 +136,46 @@ class Events
         /**
          * Fired once a post with a TRAPP id has been deleted.
          *
-         * @param int     $postId  Post ID.
+         * @param int $postId  Post ID.
+         * @param object $post WP_Post object of the deleted post.
+         * @param array  $row  Returned row from the Trapp request.
          */
-        do_action('bp_delete_trapp', $this->postId, $this->post, $row);
+        do_action('bp_delete_trapp', $this->postId, $this->post, $row);die("Noooooooes");
+    }
+
+    /**
+     * Deletes translations from Trapp master.
+     *
+     * @return void.
+     */
+    public function deleteTrappPosts()
+    {
+        $is_master = get_post_meta($this->postId, Events::TRAPP_META_MASTER, true);
+
+        if (!$is_master) {
+            return;
+        }
+
+        global $polylang;
+
+        $translations = $polylang->model->get_translations('post', $this->postId);
+
+        if (empty($translations)) {
+            return;
+        }
+
+        $service = new ServiceTranslation;
+
+        foreach ($translations as $slug => $translation) {
+            $trapp_meta = get_post_meta($translation, Events::TRAPP_META_KEY, true);
+
+            if (!$trapp_meta) {
+                continue;
+            }
+
+            $translation = $service->getById($trapp_meta);
+            #$translation->delete();
+        }
     }
 
     /**
