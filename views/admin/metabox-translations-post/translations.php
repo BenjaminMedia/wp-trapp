@@ -24,19 +24,21 @@
                 __('Add new', $text_domain)
             );
 
-            if ($value) {
+            //if ($value) {
                 $app_link = $polylang->filters_post->edit_translation_link($value);
                 $trapp_uri = get_post_meta($value, $trapp_link_key, true);
-                $trapp_link = sprintf('<a class="button button-primary" href="%1$s">%2$s</a>', esc_url($trapp_uri), __('Edit in TRAPP', $text_domain));
-            } ?>
+                //$trapp_link = sprintf('<a class="button button-primary" href="%1$s">%2$s</a>', esc_url($trapp_uri), __('Edit in TRAPP', $text_domain));
+                $trapp_link = sprintf('<a class="button" href="%1$s">%2$s</a>', 'aa', __('Edit in TRAPP', $text_domain));
+            //}
+            ?>
 
-            <?php if ($value || $is_master || !$has_trapp_key) : ?>
+            <?php #if ($value || $is_master || !$has_trapp_key) : ?>
 
             <tr>
                 <td class="pll-language-column"><?php echo $language->flag ? $language->flag : esc_html($language->slug); ?></td>
                 <td class="hidden"><?php echo $add_link;?></td>
 
-                <?php if ($is_master || !$has_trapp_key) : ?>
+                <?php #if ($is_master || !$has_trapp_key) : ?>
                     <td class="pll-language-column"><?php
                     printf('
                         <input type="hidden" name="post_tr_lang[%1$s]" id="htr_lang_%1$s" value="1"/>
@@ -46,15 +48,15 @@
                         disabled(!empty($value), true, false)
                     ); ?>
                     </td>
-                <?php endif; ?>
+                <?php #endif; ?>
 
-                    <?php if ($value) : ?>
+                    <?php #if ($value) : ?>
                         <td class="pll-edit-column"><?php echo $app_link; ?></td>
                         <td class="pll-language-column"><?php echo $trapp_link; ?></td>
-                    <?php endif; ?>
+                    <?php #endif; ?>
             </tr>
 
-            <?php endif; ?>
+            <?php #endif; ?>
 
         <?php endforeach; ?>
     </table>
