@@ -17,10 +17,10 @@ class Main
         add_action('pll_init', [__CLASS__, 'polylangInit']);
         add_action('bp_pll_init', [__CLASS__, 'bpPllInit']);
         add_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
+        add_action('before_delete_post', [__CLASS__, 'deletePost']);
 
         // Hook into plugin actions
         add_action('bp_save_trapp', [__CLASS__, 'saveTrapp'], 10, 2);
-        add_action('edit_post', [__CLASS__, 'removeSavePost']);
     }
 
     /**
@@ -40,8 +40,10 @@ class Main
      */
     public static function bpPllInit()
     {
+        add_action('edit_post', [__CLASS__, 'removeSavePost']);
         add_action('do_meta_boxes', [__CLASS__, 'polylangMetaBox'], 10, 2);
         add_action('bp_trapp_after_save_post', [__CLASS__, 'polylangCreateLanguages'], 10, 2);
+        add_action('bp_delete_trapp', [__CLASS__, 'polylangDeleteTrapp'], 10, 2);
         add_filter('bp_trapp_save_language_post_args', [__CLASS__, 'saveLanguagePostArgs'], 10, 2);
     }
 
@@ -59,6 +61,19 @@ class Main
     }
 
     /**
+     * Hook listener for before_delete_post.
+     *
+     * @param int $postId Post id of the edited post.
+     *
+     * @return void.
+     */
+    public static function deletePost($postId)
+    {
+        $events = new Post\Events($postId);
+        $events->deletePost();
+    }
+
+    /**
      * Hook listener for bp_save_trapp.
      *
      * @param int    $postId Post id of the edited post.
@@ -70,6 +85,20 @@ class Main
     {
         $events = new Post\Events($postId, $post);
         $events->savePost();
+    }
+
+    /**
+     * Hook listener for bp_delete_trapp.
+     *
+     * @param int    $postId Post id of the edited post.
+     * @param object $post   WP_Post object of the edited post.
+     *
+     * @return void.
+     */
+    public static function polylangDeleteTrapp($postId)
+    {
+        $events = new Post\Events($postId);
+        $events->deleteTrappPosts();
     }
 
     /**
