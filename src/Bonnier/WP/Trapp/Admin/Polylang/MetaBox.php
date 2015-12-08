@@ -19,7 +19,7 @@ class MetaBox
      */
     public static function registerMetaBox($post_type, $context)
     {
-        if ($post_type != 'post' || $context != 'side') {
+        if ($post_type != 'review' || $context != 'side') {
             return;
         }
 
