@@ -27,8 +27,8 @@
             if ($value) {
                 $app_link = $polylang->filters_post->edit_translation_link($value);
                 $trapp_uri = get_post_meta($value, $trapp_link_key, true);
-                $trapp_link = sprintf('<a class="button button-primary" href="%1$s">%2$s</a>', esc_url($trapp_uri), __('Edit in TRAPP', $text_domain));
-            } ?>
+                $trapp_link = sprintf('<a class="button" href="%1$s">%2$s</a>', esc_url($trapp_uri), __('Edit in TRAPP', $text_domain));
+            }  ?>
 
             <?php if ($value || $is_master || !$has_trapp_key) : ?>
 

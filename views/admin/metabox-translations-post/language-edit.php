@@ -1,1 +1,1 @@
-<h4><?php printf(__('Language: %s', $text_domain), $lang->name); ?></h4>
+<h4><?php echo sprintf('<span class="label">%s</span> %s', __('Language:', $text_domain), $lang->name); ?></h4>

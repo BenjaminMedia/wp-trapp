@@ -29,6 +29,7 @@ class MetaBox
             'post_type' => $post_type
         ];
         add_meta_box('ml_box', __('Languages', Plugin::TEXT_DOMAIN), [__CLASS__, 'polylangMetaBoxRender'], $post_type, $context, 'high', $args);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueMetaboxStyles']);
         add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueDatePicker']);
     }
 
@@ -119,6 +120,24 @@ class MetaBox
                 include(self::getView('admin/metabox-translations-post/trapp.php'));
             }
         }
+    }
+
+    /**
+     * Registers styles for the metabox.
+     *
+     * @return void.
+     */
+    public static function enqueueMetaboxStyles()
+    {
+        $script_src = Trapp\instance()->plugin_url . 'js/bp-trapp-metabox.js';
+        $style_src = Trapp\instance()->plugin_url . 'css/bp-trapp-metabox.css';
+        $deps = [
+            'jquery',
+            'jquery-ui-core'
+        ];
+
+        wp_enqueue_script('bp-trapp-metabox', $script_src, $deps);
+        wp_enqueue_style('bp-trapp-metabox', $style_src);
     }
 
     /**
