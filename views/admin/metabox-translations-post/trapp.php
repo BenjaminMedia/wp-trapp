@@ -12,7 +12,7 @@
         <label for="trapp-deadline">
             <strong><?php _e('Deadline:', $text_domain); ?></strong>
         </label>
-        <input type="text" id="trapp-deadline" name="trapp_deadline" value="<?php echo date('Y-m-d', current_time('timestamp')); ?>">
+        <input type="text" id="trapp-deadline" name="trapp_deadline" value="<?php echo $deadline; ?>">
     </div>
 
     <div class="form-field">
