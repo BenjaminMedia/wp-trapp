@@ -19,11 +19,17 @@ class MetaBox
      */
     public static function registerMetaBox($post_type, $context)
     {
-        if ($post_type != 'review' || $context != 'side') {
+        if ($context != 'side') {
             return;
         }
 
         remove_meta_box('ml_box', $post_type, $context);
+
+        $post_types = apply_filters('bp_trapp_post_types', [] );
+
+        if (!in_array($post_type, $post_types)) {
+            return;
+        }
 
         $args = [
             'post_type' => $post_type
