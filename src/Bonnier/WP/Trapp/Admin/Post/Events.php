@@ -228,29 +228,34 @@ class Events
             $service->setState('state-missing');
         }
 
-        $post_group = apply_filters('bp_trapp_post_group', 'Post', $this->postId, $this->post);
-
-        $post_group_fields = apply_filters('bp_trapp_post_group_fields', [
-            'post_title' => [
-                'label' => 'Title',
-                'value' => $this->post->post_title,
-                'group' => $post_group
-            ],
-            'post_name' => [
-                'label' => 'Name/Slug',
-                'value' => $this->post->post_name,
-                'group' => $post_group
-            ],
-            'post_content' => [
-                'label' => 'Body',
-                'value' => $this->post->post_content,
-                'group' => $post_group
+        $translationGroups = [];
+        $translationGroups['post'] = [
+            'title' => 'Post',
+            'fields' => [
+                'post_title' => [
+                    'label' => 'Title',
+                    'value' => $this->post->post_title,
+                ],
+                'post_name' => [
+                    'label' => 'Name/Slug',
+                    'value' => $this->post->post_name,
+                ],
+                'post_content' => [
+                    'label' => 'Body',
+                    'value' => $this->post->post_content,
+                ]
             ]
-        ] );
+        ];
 
-        foreach ($post_group_fields as $post_group_field) {
-            $field = TranslationField::fromArray($post_group_field);
-            $service->addField($field);
+        $translationGroups = apply_filters('bp_trapp_translation_groups', $translationGroups, $this->postId, $this->post);
+
+        foreach ($translationGroups as $translationGroup) {
+            foreach ($translationGroup['fields'] as $field) {
+                $field['group'] = $translationGroup['title'];
+
+                $field = TranslationField::fromArray($field);
+                $service->addField($field);
+            }
         }
 
         foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
@@ -264,11 +269,8 @@ class Events
             $locale = $this->filterLocale($trapp_lang->locale);
             $service->addTranslatation($locale);
         }
-ddd($service);
-        $service->save();
 
-        // Get row data after data
-        $row = $service->getRow();
+        $service->save();
 
         // Save Trapp id
         add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
@@ -289,73 +291,105 @@ ddd($service);
         // TODO Reminds alot of the insert flow so maybe merge into a common method
         global $polylang;
 
-        if (empty($_POST['trapp_tr_lang'])) {
-            return;
-        }
-
         $service = new ServiceTranslation;
-        $translation = $service->getById($this->trappId);
-        $translation->setTitle($this->post->post_title);
+        $service = $service->getById($this->trappId);
 
         if (!empty($_POST['trapp_deadline'])) {
             $deadline = esc_attr($_POST['trapp_deadline']);
             update_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
 
             $deadline = new DateTime($deadline);
-            $translation->setDeadline($deadline);
-        }
-
-        // Create new revision
-        $revision = new TranslationRevision();
-
-        if (isset($_POST['trapp_start'])) {
-            $translation->setState('state-missing');
+            $service->setDeadline($deadline);
         }
 
         if (!empty($_POST['trapp_comment'])) {
-            $translation->setComment(esc_attr($_POST['trapp_comment']));
+            $service->setComment(esc_attr($_POST['trapp_comment']));
         }
 
-        $post_group = apply_filters('bp_trapp_post_group', 'Post', $this->postId, $this->post);
+        if (isset($_POST['trapp_start'])) {
+            $service->setState('state-missing');
+        }
 
-        $title = new TranslationField('Title', $this->post->post_title);
-        $title->setGroup($post_group);
-        $revision->addField($title);
+        $translationGroups = [];
+        $translationGroups['post'] = [
+            'title' => 'Post',
+            'fields' => [
+                'post_title' => [
+                    'label' => 'Title',
+                    'value' => $this->post->post_title,
+                ],
+                'post_name' => [
+                    'label' => 'Name/Slug',
+                    'value' => $this->post->post_name,
+                ],
+                'post_content' => [
+                    'label' => 'Body',
+                    'value' => $this->post->post_content,
+                ],
+            ]
+        ];
 
-        $post_name = new TranslationField('Name/Slug', $this->post->post_name);
-        $post_name->setGroup($post_group);
-        $revision->addField($post_name);
+        $translationGroups = apply_filters('bp_trapp_translation_groups', $translationGroups, $this->postId, $this->post);
+        $serviceFields = $service->getFields();
+        $new_fields = [];
 
-        $content = new TranslationField('Body', $this->post->post_content);
-        $content->setGroup($post_group);
-        $revision->addField($content);
+        foreach ($translationGroups as $translationGroup) {
+            foreach ($translationGroup['fields'] as $field) {
+                $field['group'] = $translationGroup['title'];
 
-        // Add revision to translation
-        $translation->addRevision($revision);
+                foreach ($serviceFields as $fieldId => $serviceField) {
+                    if ($field['label'] == $serviceField->getLabel()) {
+                        $serviceFields[$fieldId]->setValue($field['value']);
+                        continue 2;
+                    }
+                }
 
-        $post_translations = wp_list_pluck($translation->translations, 'locale');
+                $new_fields[] = $field;
+            }
+        }
 
-        foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
-            $trapp_lang = esc_attr($trapp_lang);
-            $trapp_lang = $polylang->model->get_language($trapp_lang);
+        $service->setFields($serviceFields);
 
-            if (!$trapp_lang) {
+        if (!empty($new_fields)) {
+            foreach ($new_fields as $new_field) {
+                $field = TranslationField::fromArray($field);
+                $service->addField($field);
+            }
+        }
+
+        $post_translations = [];
+
+        foreach($service->getRelatedTranslations() as $serviceTranslation) {
+            if ($serviceTranslation->isOriginal()) {
                 continue;
             }
 
-            $locale = $this->filterLocale($trapp_lang->locale);
-
-            if (in_array($locale, $post_translations)) {
-                continue;
-            }
-
-            $translation->addLanguage($locale);
+            $post_translations[] = $serviceTranslation->getLocale();
         }
 
-        $translation->update();
+        if (!empty($_POST['trapp_tr_lang'])) {
+            foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
+                $trapp_lang = esc_attr($trapp_lang);
+                $trapp_lang = $polylang->model->get_language($trapp_lang);
+
+                if (!$trapp_lang) {
+                    continue;
+                }
+
+                $locale = $this->filterLocale($trapp_lang->locale);
+
+                if (in_array($locale, $post_translations)) {
+                    continue;
+                }
+
+                $service->addTranslatation($locale);
+            }
+        }
+
+        $service->update();
 
         // Get row data after data
-        $row = $translation->getRow();
+        $row = $service->getRow();
 
         do_action('bp_trapp_after_save_post', $row, $this->post);
 
