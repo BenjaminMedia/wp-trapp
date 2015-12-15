@@ -122,20 +122,10 @@ class Events
             return;
         }
 
-        /**
-         * Fired before a post with a TRAPP id is about to get deleted.
-         * This is to make sure that translations gets removed
-         * before the master is getting deleted.
-         *
-         * @param int $postId  Post ID.
-         */
-        do_action('bp_before_delete_trapp', $this->postId);
-ddd($this->trappId);
         $service = new ServiceTranslation;
         $service = $service->getById($this->trappId);
-d($service);
         $service->delete();
-ddd($service);
+
         $row = $service->getRow();
 
         /**
@@ -149,13 +139,13 @@ ddd($service);
     }
 
     /**
-     * Deletes translations from Trapp master.
+     * Deletes translations Trapp Ids when the post is master.
      *
      * @return void.
      */
     public function deleteTrappPosts()
     {
-        $is_master = get_post_meta($this->postId, Events::TRAPP_META_MASTER, true);
+        $is_master = get_post_meta($this->postId, self::TRAPP_META_MASTER, true);
 
         if (!$is_master) {
             return;
@@ -169,23 +159,19 @@ ddd($service);
             return;
         }
 
-        $service = new ServiceTranslation;
-
         foreach ($translations as $slug => $translation) {
             if ($translation == $this->postId) {
                 continue;
             }
 
-            $trapp_meta = get_post_meta($translation, Events::TRAPP_META_KEY, true);
+            $trapp_meta = get_post_meta($translation, self::TRAPP_META_KEY, true);
 
             if (!$trapp_meta) {
                 continue;
             }
-d($trapp_meta);
-            $translation = $service->getById($trapp_meta);
-            $translation->delete();
 
-            delete_post_meta($translation, Events::TRAPP_META_KEY);
+            delete_post_meta($translation, self::TRAPP_META_KEY);
+            delete_post_meta($translation, self::TRAPP_META_LINK);
         }
     }
 
