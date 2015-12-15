@@ -49,11 +49,17 @@ class Events
      */
     public function setRowTranslations()
     {
-        foreach ($this->row->translations as $translation) {
-            $id = $translation['id'];
+        foreach ($this->row->related_translations as $translation) {
+            if ($translation['is_original']) {
+                continue;
+            }
+
             $locale = $translation['locale'];
 
-            $this->rowTranslations[$locale] = $id;
+            $this->rowTranslations[$locale] = [
+                'id' => $translation['id'],
+                'edit_uri' => $translation['edit_uri']
+            ];
         }
     }
 
@@ -68,14 +74,14 @@ class Events
 
         $translations = $polylang->model->get_translations('post', $this->post->ID);
 
-        foreach ($this->rowTranslations as $locale => $id) {
+        foreach ($this->rowTranslations as $locale => $translation) {
             // Polylang is using the slug to set post languages
             $language_slug = current(explode('_', $locale));
 
             if (!array_key_exists($language_slug, $translations)) {
                 $lang_post_args = apply_filters('bp_trapp_save_language_post_args', [
-                    'post_title' => '',
-                    'post_content' => '',
+                    'post_title' => $this->post->post_title,
+                    'post_content' => $this->post->post_content,
                     'post_type' => $this->post->post_type,
                 ], $this->post, $language_slug);
 
@@ -86,7 +92,8 @@ class Events
             }
 
             // Update the meta key
-            update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_KEY, $id);
+            update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_KEY, $translation['id']);
+            update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_LINK, $translation['edit_uri']);
         }
 
         pll_save_post_translations($translations);
