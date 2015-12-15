@@ -198,7 +198,7 @@ class Events
     {
         global $polylang;
 
-        if (empty($_POST['trapp_tr_lang'])) {
+        if (empty($_POST['trapp_tr_lang']) && !$this->hasPostTranslations()) {
             return;
         }
 
@@ -255,7 +255,15 @@ class Events
             }
         }
 
-        foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
+        if (!empty($_POST['trapp_tr_lang'])) {
+            $languages = $_POST['trapp_tr_lang'];
+        } else {
+            $languages = $this->getPostTranslations();
+        }
+
+        $languages = array_keys($languages);
+
+        foreach ($languages as $trapp_lang) {
             $trapp_lang = esc_attr($trapp_lang);
             $trapp_lang = $polylang->model->get_language($trapp_lang);
 
@@ -419,9 +427,13 @@ class Events
         return get_post_meta($this->postId, self::TRAPP_META_KEY, true);
     }
 
-    public function getPostLocale()
+    public function getPostLocale($postId = 0)
     {
-        $locale = pll_get_post_language($this->postId, 'locale');
+        if (empty( $postId)) {
+            $postId = $this->postId;
+        }
+
+        $locale = pll_get_post_language($postId, 'locale');
         $locale = $this->filterLocale($locale);
 
         return $locale;
@@ -434,5 +446,22 @@ class Events
         }
 
         return strtolower($locale);
+    }
+
+    public function hasPostTranslations() {
+        return (!empty($this->getPostTranslations()));
+    }
+
+    public function getPostTranslations() {
+        global $polylang;
+
+        $language = pll_get_post_language($this->postId);
+        $translations = $polylang->model->get_translations('post', $this->postId);
+
+        if (array_key_exists($language, $translations)) {
+            unset($translations[$language]);
+        }
+
+        return $translations;
     }
 }
