@@ -36,11 +36,9 @@ class ServiceTranslation extends Trapp\ServiceTranslation
      */
     public function save()
     {
-        $this->app_code = $this->getAppCode();
-        $this->brand_code = $this->getBrandCode();
-d("setAppCode('fordelszonen')");
-d("\$service->setBrandCode('kom');");
-ddd($this);
+        $this->setAppCode($this->getAppCode());
+        $this->setBrandCode($this->getBrandCode());
+
         return parent::save();
     }
 
