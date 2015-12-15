@@ -272,6 +272,9 @@ class Events
 
         $service->save();
 
+        // Get row data after data
+        $row = $service->getRow();
+
         // Save Trapp id
         add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
 

@@ -78,8 +78,8 @@ class Events
 
             if (!array_key_exists($language_slug, $translations)) {
                 $lang_post_args = apply_filters('bp_trapp_save_language_post_args', [
-                    'post_title' => '',
-                    'post_content' => '',
+                    'post_title' => $this->post->post_title,
+                    'post_content' => $this->post->post_content,
                     'post_type' => $this->post->post_type,
                 ], $this->post, $language_slug);
 
