@@ -123,34 +123,29 @@ class Events
         }
 
         $service = new ServiceTranslation;
-// Test delete these
-// Master 56619b7bc01443c03e8b456b
-#56619b7bc01443c03e8b4575
-#56619b7bc01443c03e8b4570
+        $service = $service->getById($this->trappId);
+        $service->delete();
 
-        $translation = $service->getById($this->trappId);
-        #$translation->delete();
-
-        $row = $translation->getRow();
+        $row = $service->getRow();
 
         /**
          * Fired once a post with a TRAPP id has been deleted.
          *
-         * @param int $postId  Post ID.
+         * @param int    $postId  Post ID.
          * @param object $post WP_Post object of the deleted post.
          * @param array  $row  Returned row from the Trapp request.
          */
-        do_action('bp_delete_trapp', $this->postId, $this->post, $row);die("Noooooooes");
+        do_action('bp_after_delete_trapp', $this->postId, $this->post, $row);
     }
 
     /**
-     * Deletes translations from Trapp master.
+     * Deletes translations Trapp Ids when the post is master.
      *
      * @return void.
      */
     public function deleteTrappPosts()
     {
-        $is_master = get_post_meta($this->postId, Events::TRAPP_META_MASTER, true);
+        $is_master = get_post_meta($this->postId, self::TRAPP_META_MASTER, true);
 
         if (!$is_master) {
             return;
@@ -164,17 +159,19 @@ class Events
             return;
         }
 
-        $service = new ServiceTranslation;
-
         foreach ($translations as $slug => $translation) {
-            $trapp_meta = get_post_meta($translation, Events::TRAPP_META_KEY, true);
+            if ($translation == $this->postId) {
+                continue;
+            }
+
+            $trapp_meta = get_post_meta($translation, self::TRAPP_META_KEY, true);
 
             if (!$trapp_meta) {
                 continue;
             }
 
-            $translation = $service->getById($trapp_meta);
-            #$translation->delete();
+            delete_post_meta($translation, self::TRAPP_META_KEY);
+            delete_post_meta($translation, self::TRAPP_META_LINK);
         }
     }
 
