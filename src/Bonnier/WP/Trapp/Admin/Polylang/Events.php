@@ -49,7 +49,11 @@ class Events
      */
     public function setRowTranslations()
     {
-        foreach ($this->row->translations as $translation) {
+        foreach ($this->row->related_translations as $translation) {
+            if ($translation['is_original']) {
+                continue;
+            }
+
             $id = $translation['id'];
             $locale = $translation['locale'];
 
