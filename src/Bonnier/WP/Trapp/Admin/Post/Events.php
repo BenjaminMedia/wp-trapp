@@ -367,7 +367,7 @@ class Events
 
         $post_translations = [];
 
-        foreach($service->getRelatedTranslations() as $serviceTranslation) {
+        foreach ($service->getRelatedTranslations() as $serviceTranslation) {
             if ($serviceTranslation->isOriginal()) {
                 continue;
             }
@@ -429,7 +429,7 @@ class Events
 
     public function getPostLocale($postId = 0)
     {
-        if (empty( $postId)) {
+        if (empty($postId)) {
             $postId = $this->postId;
         }
 
@@ -448,11 +448,13 @@ class Events
         return strtolower($locale);
     }
 
-    public function hasPostTranslations() {
+    public function hasPostTranslations()
+    {
         return (!empty($this->getPostTranslations()));
     }
 
-    public function getPostTranslations() {
+    public function getPostTranslations()
+    {
         global $polylang;
 
         $language = pll_get_post_language($this->postId);

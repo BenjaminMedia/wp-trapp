@@ -155,7 +155,8 @@ class Main
      *
      * @return void.
      */
-    public static function removeSavePost($postId) {
+    public static function removeSavePost($postId)
+    {
         if (get_post_status($postId) == 'auto-draft') {
             return;
         }
