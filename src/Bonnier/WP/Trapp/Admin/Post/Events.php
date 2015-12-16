@@ -3,6 +3,7 @@
 namespace Bonnier\WP\Trapp\Admin\Post;
 
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Core\Endpoints;
 use Bonnier\WP\Trapp\Core\ServiceTranslation;
 use Bonnier\Trapp\Translation\TranslationRevision;
 use Bonnier\Trapp\Translation\TranslationField;
@@ -216,6 +217,7 @@ class Events
         $service->setDeadline($deadline);
         $service->setLocale($this->getPostLocale());
         $service->setTitle($this->post->post_title);
+        $service->setUpdateEndpointUri($this->getUpdateEndpoint());
 
         if (!empty($_POST['trapp_comment'])) {
             $service->setComment(esc_attr($_POST['trapp_comment']));
@@ -400,7 +402,14 @@ class Events
         $row = $service->getRow();
 
         do_action('bp_trapp_after_save_post', $row, $this->post);
+    }
 
+    public function getUpdateEndpoint() {
+        $endpoints = new Endpoints;
+        $rest_url = get_rest_url();
+        $route = $endpoints->getNameSpace() . '/' . $endpoints::ROUTE_UPDATE_CALLBACK;
+
+        return $rest_url . $route;
     }
 
     /**

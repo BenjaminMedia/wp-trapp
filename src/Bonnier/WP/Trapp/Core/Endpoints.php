@@ -24,13 +24,14 @@ class Endpoints extends WP_REST_Controller
     /**
      * The name of the update callback route.
      */
-    const ROUTE_UPDATE_CALLBACK = 'update_callback';
+    const ROUTE_UPDATE_CALLBACK = 'update_translation';
 
     /**
      * Sets credentials from WP filters.
      */
     public function registerRoutes()
     {
+        #ddd(get_option('bp_trapp_test_callback'));
         $namespace = $this->getNameSpace();
 
         register_rest_route($namespace, '/' . self::ROUTE_UPDATE_CALLBACK, [
