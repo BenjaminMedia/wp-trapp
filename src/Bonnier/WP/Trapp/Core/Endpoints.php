@@ -22,19 +22,26 @@ class Endpoints extends WP_REST_Controller
     const VERSION = '1';
 
     /**
+     * The name of the update callback route.
+     */
+    const ROUTE_UPDATE_CALLBACK = 'update_callback';
+
+    /**
      * Sets credentials from WP filters.
      */
     public function registerRoutes()
     {
-        #ddd(get_option('bp_trapp_test_callback'));
-        $namespace = sprintf('%s/v%d', self::PREFIX, self::VERSION);
-        $route = 'update_callback';
+        $namespace = $this->getNameSpace();
 
-        register_rest_route($namespace, '/' . $route, [
+        register_rest_route($namespace, '/' . self::ROUTE_UPDATE_CALLBACK, [
             'methods'             => WP_REST_Server::EDITABLE,
             'callback'            => array( $this, 'updateTrapp' ),
             #'permission_callback' => array( $this, 'updateTrappPermissions' ),
         ]);
+    }
+
+    public function getNameSpace() {
+        return sprintf('%s/v%d', self::PREFIX, self::VERSION);
     }
 
     public function updateTrapp($request)
@@ -49,7 +56,10 @@ class Endpoints extends WP_REST_Controller
         array_unshift($option, $entry);
         update_option($name, $option);
 
-        return;
+        $response = new WP_REST_Response( ['Callback saved.'], 200 );
+
+        return $response;
+
         $request = $this->getRequest('sv');
 
         $trappId = $request->getId();
