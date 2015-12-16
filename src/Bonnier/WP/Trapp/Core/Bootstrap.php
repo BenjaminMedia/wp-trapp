@@ -29,10 +29,22 @@ class Bootstrap
      */
     public function coreBootstrap()
     {
+        add_action('rest_api_init', [__CLASS__, 'registerEndpoints' ] );
         add_filter('bp_trapp_service_username', [__CLASS__, 'serviceUser']);
         add_filter('bp_trapp_service_secret', [__CLASS__, 'serviceSecret']);
         add_filter('bp_trapp_save_app_code', [__CLASS__, 'saveAppCode']);
         add_filter('bp_trapp_save_brand_code', [__CLASS__, 'saveBrandCode']);
+    }
+
+    /**
+     * Registers plugin endpoints.
+     *
+     * @return void.
+     */
+    public static function registerEndpoints()
+    {
+        $endPoints = new Endpoints;
+        $endPoints->registerRoutes();
     }
 
     /**
