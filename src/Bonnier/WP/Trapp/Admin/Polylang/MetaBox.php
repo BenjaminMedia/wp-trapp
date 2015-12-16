@@ -166,7 +166,8 @@ class MetaBox
      *
      * @return string       Full include path.
      */
-    public static function getView($path = '') {
+    public static function getView($path = '')
+    {
         $dir = Trapp\instance()->plugin_dir . 'views/';
 
         return $dir . $path;
