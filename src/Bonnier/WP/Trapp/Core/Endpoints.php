@@ -8,11 +8,6 @@ use WP_REST_Controller;
 use WP_REST_Server;
 use WP_REST_Response;
 
-/**
- * ServiceContent WP class.
- *
- * Initiates Trapp\ServiceTranslation with credentials set from filters.
-*/
 class Endpoints extends WP_REST_Controller
 {
 
@@ -31,18 +26,30 @@ class Endpoints extends WP_REST_Controller
      */
     public function registerRoutes()
     {
+        #ddd(get_option('bp_trapp_test_callback'));
         $namespace = sprintf('%s/v%d', self::PREFIX, self::VERSION);
-        $base = 'phhtrapp';
+        $route = 'update_callback';
 
-        register_rest_route($namespace, '/' . $base, [
+        register_rest_route($namespace, '/' . $route, [
             'methods'             => WP_REST_Server::EDITABLE,
             'callback'            => array( $this, 'updateTrapp' ),
-            'permission_callback' => array( $this, 'updateTrappPermissions' ),
+            #'permission_callback' => array( $this, 'updateTrappPermissions' ),
         ]);
     }
 
-    public function updateTrapp()
+    public function updateTrapp($request)
     {
+        $name = 'bp_trapp_test_callback';
+        $option = get_option($name, []);
+        $entry = [
+            'request' => $request,
+            'post' => $_POST
+        ];
+
+        array_unshift($option, $entry);
+        update_option($name, $option);
+
+        return;
         $request = $this->getRequest('sv');
 
         $trappId = $request->getId();
