@@ -31,13 +31,16 @@ class Endpoints extends WP_REST_Controller
      */
     public function registerRoutes()
     {
-        #ddd(get_option('bp_trapp_test_callback'));
         $namespace = $this->getNameSpace();
 
         register_rest_route($namespace, '/' . self::ROUTE_UPDATE_CALLBACK, [
             'methods'             => WP_REST_Server::EDITABLE,
             'callback'            => array( $this, 'updateTrapp' ),
             #'permission_callback' => array( $this, 'updateTrappPermissions' ),
+        ]);
+        register_rest_route($namespace, '/translation_callbacks', [
+            'methods'             => WP_REST_Server::READABLE,
+            'callback'            => array( $this, 'translationCallbacks' ),
         ]);
     }
 
@@ -88,6 +91,11 @@ class Endpoints extends WP_REST_Controller
         $response = new WP_REST_Response( ['Success. Post Updated.'], 200 );
 
         return $response;
+    }
+
+    public function translationCallbacks()
+    {
+        return get_option('bp_trapp_test_callback', array());
     }
 
     public function updateField($group, $label, $post_id)
