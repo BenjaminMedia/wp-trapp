@@ -54,7 +54,8 @@ class Endpoints extends WP_REST_Controller
         $option = get_option($name, []);
         $entry = [
             'request' => $request,
-            'post' => $_POST
+            'post' => $_POST,
+            'raw' => file_get_contents('php://input')
         ];
 
         array_unshift($option, $entry);
@@ -95,6 +96,8 @@ class Endpoints extends WP_REST_Controller
 
     public function translationCallbacks()
     {
+    #    $this->htmlHeader();
+    #    ddd(get_option('bp_trapp_test_callback', array()));
         return get_option('bp_trapp_test_callback', array());
     }
 
