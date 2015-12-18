@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp;
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Admin\Post\Events;
 use PLL_Walker_Dropdown;
 
 class MetaBox
@@ -28,6 +29,7 @@ class MetaBox
             'post_type' => $post_type
         ];
         add_meta_box('ml_box', __('Languages', Plugin::TEXT_DOMAIN), [__CLASS__, 'polylangMetaBoxRender'], $post_type, $context, 'high', $args);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueMetaboxStyles']);
         add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueDatePicker']);
     }
 
@@ -64,6 +66,23 @@ class MetaBox
             'flag'     => true
         ));
 
+        $masterLink = '';
+
+        foreach ($languages as $language) {
+            $languagePost = $polylang->model->get_translation('post', $post_id, $language);
+
+            if (!$languagePost) {
+                continue;
+            }
+
+            $languageMasterMeta = get_post_meta($languagePost, Events::TRAPP_META_MASTER, true);
+
+            if ($languageMasterMeta) {
+                $masterLink = sprintf('<a href="%s">%s</a>', get_edit_post_link($languagePost), $language->name);
+                break;
+            }
+        }
+
         foreach ($languages as $key_language => $language) {
             if ($language->term_id == $lang->term_id) {
                 unset($languages[ $key_language ]);
@@ -74,14 +93,51 @@ class MetaBox
 
         wp_nonce_field('pll_language', '_pll_nonce');
 
+        // These shold really exist in some other methods.. whenever the structure has been very defined
         $is_autopost = (get_post_status($post) == 'auto-draft');
+        $is_master = get_post_meta($post->ID, Events::TRAPP_META_MASTER, true);
+        $has_trapp_key = get_post_meta($post->ID, Events::TRAPP_META_KEY, true);
+        $trapp_link_key = Events::TRAPP_META_LINK;
 
-        include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/language.php');
+        if ($is_autopost) {
+            include(self::getView('admin/metabox-translations-post/language.php'));
+        } else {
+            include(self::getView('admin/metabox-translations-post/language-edit.php'));
 
-        if (!$is_autopost) {
-            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/translations.php');
-            include(Trapp\instance()->plugin_dir . 'views/admin/metabox-translations-post/trapp.php');
+            if (!$is_master) {
+                include(self::getView('admin/metabox-translations-post/language-edit-translation.php'));
+            }
+
+            include(self::getView('admin/metabox-translations-post/translations.php'));
+
+            if ($is_master || !$has_trapp_key) {
+                $deadline = get_post_meta($post->ID, Events::TRAPP_META_DEADLINE, true);
+
+                if (empty($deadline)) {
+                    $deadline = date('Y-m-d', current_time('timestamp'));
+                }
+
+                include(self::getView('admin/metabox-translations-post/trapp.php'));
+            }
         }
+    }
+
+    /**
+     * Registers styles for the metabox.
+     *
+     * @return void.
+     */
+    public static function enqueueMetaboxStyles()
+    {
+        $script_src = Trapp\instance()->plugin_url . 'js/bp-trapp-metabox.js';
+        $style_src = Trapp\instance()->plugin_url . 'css/bp-trapp-metabox.css';
+        $deps = [
+            'jquery',
+            'jquery-ui-core'
+        ];
+
+        wp_enqueue_script('bp-trapp-metabox', $script_src, $deps);
+        wp_enqueue_style('bp-trapp-metabox', $style_src);
     }
 
     /**
@@ -101,5 +157,19 @@ class MetaBox
 
         wp_enqueue_script('bp-trapp-datepicker', $script_src, $deps);
         wp_enqueue_style('bp-trapp-datepicker', $style_src);
+    }
+
+    /**
+     * Returns view by path.
+     *
+     * @param  string $path Path to the view.
+     *
+     * @return string       Full include path.
+     */
+    public static function getView($path = '')
+    {
+        $dir = Trapp\instance()->plugin_dir . 'views/';
+
+        return $dir . $path;
     }
 }
