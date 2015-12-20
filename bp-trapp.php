@@ -118,3 +118,21 @@ add_filter('bp_trapp_service_development', function ($is_development) {
 
     return true;
 });
+
+add_action('init', function() {
+    if ( $_SERVER['REQUEST_URI'] != '/wp-json/bp/trapp/v1/update_translation' ) {
+        return;
+    }
+
+    $name = 'bp_trapp_test_callback_raw';
+    $option = get_option($name, []);
+    $entry = [
+        'post' => $_POST,
+        'request' => $_REQUEST,
+        'raw' => file_get_contents('php://input'),
+        'server' => $_SERVER,
+    ];
+
+    array_unshift($option, $entry);
+    update_option($name, $option);
+});

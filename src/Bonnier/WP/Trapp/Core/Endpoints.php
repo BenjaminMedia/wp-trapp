@@ -42,6 +42,10 @@ class Endpoints extends WP_REST_Controller
             'methods'             => WP_REST_Server::READABLE,
             'callback'            => array( $this, 'translationCallbacks' ),
         ]);
+        register_rest_route($namespace, '/translation_callbacks_raw', [
+            'methods'             => WP_REST_Server::READABLE,
+            'callback'            => array( $this, 'translationCallbacksRaw' ),
+        ]);
     }
 
     public function getNameSpace() {
@@ -55,7 +59,7 @@ class Endpoints extends WP_REST_Controller
         $entry = [
             'request' => $request,
             'post' => $_POST,
-            'raw' => file_get_contents('php://input')
+            'raw' => file_get_contents('php://input'),
         ];
 
         array_unshift($option, $entry);
@@ -99,6 +103,11 @@ class Endpoints extends WP_REST_Controller
     #    $this->htmlHeader();
     #    ddd(get_option('bp_trapp_test_callback', array()));
         return get_option('bp_trapp_test_callback', array());
+    }
+
+    public function translationCallbacksRaw()
+    {
+        return get_option('bp_trapp_test_callback_raw', array());
     }
 
     public function updateField($group, $label, $post_id)
