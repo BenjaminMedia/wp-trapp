@@ -168,6 +168,8 @@ class Endpoints extends WP_REST_Controller
     public function getFromCallback() {
         $json = file_get_contents('php://input');
         $request = ServiceTranslation::fromCallback('', '', $json);
+
+        return $request;
     }
 
     public function htmlHeader() {
