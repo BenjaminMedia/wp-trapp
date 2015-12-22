@@ -36,15 +36,7 @@ class Endpoints extends WP_REST_Controller
         register_rest_route($namespace, '/' . self::ROUTE_UPDATE_CALLBACK, [
             'methods'             => WP_REST_Server::EDITABLE,
             'callback'            => array( $this, 'updateTrapp' ),
-            #'permission_callback' => array( $this, 'updateTrappPermissions' ),
-        ]);
-        register_rest_route($namespace, '/translation_callbacks', [
-            'methods'             => WP_REST_Server::READABLE,
-            'callback'            => array( $this, 'translationCallbacks' ),
-        ]);
-        register_rest_route($namespace, '/translation_callbacks_raw', [
-            'methods'             => WP_REST_Server::READABLE,
-            'callback'            => array( $this, 'translationCallbacksRaw' ),
+            'permission_callback' => array( $this, 'updateTrappPermissions' ),
         ]);
     }
 
@@ -52,25 +44,9 @@ class Endpoints extends WP_REST_Controller
         return sprintf('%s/v%d', self::PREFIX, self::VERSION);
     }
 
-    public function updateTrapp($request)
+    public function updateTrapp()
     {
-        $name = 'bp_trapp_test_callback';
-        $option = get_option($name, []);
-        $entry = [
-            'request' => $request,
-            'post' => $_POST,
-            'raw' => file_get_contents('php://input'),
-        ];
-
-        array_unshift($option, $entry);
-        update_option($name, $option);
-
-        $response = new WP_REST_Response( ['Callback saved.'], 200 );
-
-        return $response;
-
-        $request = $this->getRequest('sv');
-
+        $request = $this->getFromCallback();
         $trappId = $request->getId();
         $post = $this->getPostByTrappId($trappId);
 
@@ -89,8 +65,9 @@ class Endpoints extends WP_REST_Controller
         foreach ($fields as $field) {
             $group = $field->getGroup();
             $label = $field->getLabel();
+            $value = $field->getValue();
 
-            $this->updateField($group, $label, $post->ID);
+            $this->updateField($group, $label, $value, $post->ID);
         }
 
         $response = new WP_REST_Response( ['Success. Post Updated.'], 200 );
@@ -98,19 +75,7 @@ class Endpoints extends WP_REST_Controller
         return $response;
     }
 
-    public function translationCallbacks()
-    {
-    #    $this->htmlHeader();
-    #    ddd(get_option('bp_trapp_test_callback', array()));
-        return get_option('bp_trapp_test_callback', array());
-    }
-
-    public function translationCallbacksRaw()
-    {
-        return get_option('bp_trapp_test_callback_raw', array());
-    }
-
-    public function updateField($group, $label, $post_id)
+    public function updateField($group, $label, $value, $post_id)
     {
         $group = strtolower($group);
 
@@ -118,7 +83,6 @@ class Endpoints extends WP_REST_Controller
         $translationGroups = [];
         $translationGroups['post'] = [
             'post_title' => 'Title',
-            'post_name' => 'Name/Slug',
             'post_content' => 'Body',
         ];
 
@@ -133,13 +97,11 @@ class Endpoints extends WP_REST_Controller
             return false;
         }
 
-        $updateFieldValue = $groupFields[$updateFieldKey];
-
         // Each $groupFields should have its own callback when mapping instead of this custom one
 
         $update_args = [];
         $update_args['ID'] = $post_id;
-        $update_args[$updateFieldKey] = $updateFieldValue;
+        $update_args[$updateFieldKey] = $value;
 
         // Update post
         $updated_post_id = wp_update_post( $update_args, true );
@@ -178,11 +140,12 @@ class Endpoints extends WP_REST_Controller
     /**
      * Check if a given request has access to update a specific item
      *
-     * @param WP_REST_Request $request Full data about the request.
      * @return WP_Error|bool
      */
-    public function updateTrappPermissions($request )
+    public function updateTrappPermissions()
     {
+        $request = $this->getFromCallback();
+
         return $this->create_item_permissions_check($request);
     }
 
@@ -192,9 +155,8 @@ class Endpoints extends WP_REST_Controller
      * @param WP_REST_Request $request Full data about the request.
      * @return WP_Error|bool
      */
-    public function create_item_permissions_check( $request ) {
+    public function create_item_permissions_check($request) {
         $service = new ServiceTranslation;
-        $request = $this->getRequest()->getService();
 
         if ( $service->getUserName() == $request->getUserName() && $service->getSecret() == $request->getSecret() ) {
             return true;
@@ -203,22 +165,9 @@ class Endpoints extends WP_REST_Controller
         return false;
     }
 
-    public function getRequest($translation = '') {
-        $request = new ServiceTranslation;
-
-        switch ($translation) {
-            case 'no':
-                $id = '567136b0c014436f638b456c';
-                break;
-            case 'sv':
-                $id = '567136b0c014436f638b4571';
-                break;
-            case 'master':
-            default:
-                $id = '567136b0c014436f638b4567';
-        }
-
-        return $request->getById($id);
+    public function getFromCallback() {
+        $json = file_get_contents('php://input');
+        $request = ServiceTranslation::fromCallback('', '', $json);
     }
 
     public function htmlHeader() {
