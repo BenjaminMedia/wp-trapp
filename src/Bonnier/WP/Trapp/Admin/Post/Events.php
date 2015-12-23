@@ -235,10 +235,6 @@ class Events
                     'label' => 'Title',
                     'value' => $this->post->post_title,
                 ],
-                'post_name' => [
-                    'label' => 'Name/Slug',
-                    'value' => $this->post->post_name,
-                ],
                 'post_content' => [
                     'label' => 'Body',
                     'value' => $this->post->post_content,
@@ -327,10 +323,6 @@ class Events
                 'post_title' => [
                     'label' => 'Title',
                     'value' => $this->post->post_title,
-                ],
-                'post_name' => [
-                    'label' => 'Name/Slug',
-                    'value' => $this->post->post_name,
                 ],
                 'post_content' => [
                     'label' => 'Body',
