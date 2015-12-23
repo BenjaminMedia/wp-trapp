@@ -60,6 +60,10 @@ class Endpoints extends WP_REST_Controller
             return false; // Or like "Master translation cannot get updated"
         }
 
+        if ($request->getState() != 'state-translated') {
+            return false;
+        }
+
         $fields = $request->getFields();
 
         foreach ($fields as $field) {
@@ -170,6 +174,10 @@ class Endpoints extends WP_REST_Controller
         $request = ServiceTranslation::fromCallback('', '', $json);
 
         return $request;
+    }
+
+    public function testArray() {
+        return get_option('bp_trapp_test_callback');
     }
 
     public function htmlHeader() {
