@@ -40,12 +40,16 @@ class Mappings
                         'label' => 'Post Thumbnail Title',
                         'value' => $thumbnailPost->post_title,
                     ],
-                    'alt' => [
-                        'label' => 'Post Thumbnail Alt',
-                        'value' => get_post_meta($thumbnailId, '_wp_attachment_image_alt', true)
-                    ]
                 ]
             ];
+
+            $alt = get_post_meta($thumbnailId, '_wp_attachment_image_alt', true);
+            if ($alt) {
+                $translationGroups['post_thumbnail']['fields']['alt'] = [
+                    'label' => 'Post Thumbnail Alt',
+                    'value' => $alt,
+                ];
+            }
         }
 
         return apply_filters('bp_trapp_translation_groups', $translationGroups, $postId, $post);
