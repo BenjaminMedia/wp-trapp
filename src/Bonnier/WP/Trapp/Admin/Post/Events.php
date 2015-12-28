@@ -327,8 +327,8 @@ class Events
 
         if (!empty($new_fields)) {
             foreach ($new_fields as $new_field) {
-                $field = TranslationField::fromArray($field);
-                $service->addField($field);
+                $new_field = TranslationField::fromArray($new_field);
+                $service->addField($new_field);
             }
         }
 
