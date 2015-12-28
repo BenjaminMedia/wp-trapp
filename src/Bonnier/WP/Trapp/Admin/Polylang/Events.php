@@ -76,6 +76,7 @@ class Events
 
         foreach ($this->rowTranslations as $locale => $translation) {
             // Polylang is using the slug to set post languages
+
             $language_slug = current(explode('_', $locale));
 
             if (!array_key_exists($language_slug, $translations)) {
@@ -94,6 +95,45 @@ class Events
             // Update the meta key
             update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_KEY, $translation['id']);
             update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_LINK, $translation['edit_uri']);
+
+            if (!has_post_thumbnail($this->post->ID)) {
+                continue;
+            }
+
+            $thumbnailId = get_post_thumbnail_id($this->post->ID);
+            $thumbnailPost = get_post($thumbnailId);
+            // $new_lang = lang
+
+            // Check if the translations already exists
+            if ($translation = $polylang->model->get_translation('post', $thumbnailId, $language_slug)) {
+                update_post_meta($translations[$language_slug], '_thumbnail_id', $translation);
+            }
+
+            $translationThumbnailPost = $thumbnailPost;
+
+            // Create a new attachment
+            $translationThumbnailPost->ID = null;
+            $translationThumbnailPost->post_parent = $translations[$language_slug];
+
+            $translationThumbnailId = wp_insert_attachment($translationThumbnailPost);
+
+            add_post_meta($translationThumbnailId, '_wp_attachment_metadata', get_post_meta($thumbnailId, '_wp_attachment_metadata', true));
+            add_post_meta($translationThumbnailId, '_wp_attached_file', get_post_meta($thumbnailId, '_wp_attached_file', true));
+            add_post_meta($translationThumbnailId, '_wp_attachment_image_alt', get_post_meta($thumbnailId, '_wp_attachment_image_alt', true));
+
+            // Amazon S3
+            add_post_meta($translationThumbnailId, 'amazonS3_info', get_post_meta($thumbnailId, 'amazonS3_info', true));
+
+            $mediaTranslations = $polylang->model->get_translations('post', $thumbnailId);
+
+            if (!$mediaTranslations && $lang = $polylang->model->get_post_language($thumbnailId)) {
+                $mediaTranslations[$lang->slug] = $thumbnailId;
+            }
+
+            $mediaTranslations[$language_slug] = $translationThumbnailId;
+
+            pll_save_post_translations($mediaTranslations);
+            update_post_meta($translations[$language_slug], '_thumbnail_id', $translationThumbnailId);
         }
 
         pll_save_post_translations($translations);
