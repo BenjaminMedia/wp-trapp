@@ -73,9 +73,9 @@ class ServiceTranslation extends Trapp\ServiceTranslation
     }
 
     /**
-     * Gets the secret for the ServiceTranslation.
+     * Gets the App code for the ServiceTranslation.
      *
-     * @return string The ServiceTranslation secret.
+     * @return string The ServiceTranslation App code.
      */
     public function getAppCode()
     {
@@ -83,9 +83,9 @@ class ServiceTranslation extends Trapp\ServiceTranslation
     }
 
     /**
-     * Gets the secret for the ServiceTranslation.
+     * Gets the Brand code for the ServiceTranslation.
      *
-     * @return string The ServiceTranslation secret.
+     * @return string The ServiceTranslation Brand code.
      */
     public function getBrandCode()
     {

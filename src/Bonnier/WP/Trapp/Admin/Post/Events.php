@@ -211,6 +211,10 @@ class Events
         $service = new ServiceTranslation;
 
         $deadline = esc_attr($_POST['trapp_deadline']);
+
+        // Save Deadline
+        add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
+
         $deadline = new DateTime($deadline);
 
         $service->setDeadline($deadline);
@@ -264,9 +268,6 @@ class Events
 
         // Save Trapp ID
         add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
-
-        // Save Deadline
-        add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
 
         // This is the first saved post and therefore master
         add_post_meta($this->postId, self::TRAPP_META_MASTER, 1);
