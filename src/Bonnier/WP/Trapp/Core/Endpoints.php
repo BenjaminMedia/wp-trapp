@@ -79,15 +79,20 @@ class Endpoints extends WP_REST_Controller
         return $response;
     }
 
-    public function updateField($group, $label, $value, $post_id)
+    public function updateField($group, $label, $value, $postId)
     {
         $group = strtolower($group);
 
         // TODO Filter here for mappings
-        $translationGroups = [];
-        $translationGroups['post'] = [
-            'post_title' => 'Title',
-            'post_content' => 'Body',
+        $translationGroups = [
+            'post' => [
+                'post_title' => 'Post Title',
+                'post_content' => 'Post Body',
+            ],
+            'post_thumbnail' => [
+                'post_title' => 'Post Thumbnail Title',
+                'alt' => 'Post Thumbnail Alt',
+            ],
         ];
 
         if (!array_key_exists($group, $translationGroups)) {
@@ -103,12 +108,13 @@ class Endpoints extends WP_REST_Controller
 
         // Each $groupFields should have its own callback when mapping instead of this custom one
 
-        $update_args = [];
-        $update_args['ID'] = $post_id;
-        $update_args[$updateFieldKey] = $value;
+        if ($group == 'post') {
+            $update_args = [];
+            $update_args['ID'] = $postId;
+            $update_args[$updateFieldKey] = $value;
 
-        // Update post
-        $updated_post_id = wp_update_post( $update_args, true );
+            // Update post
+            $updated_post_id = wp_update_post( $update_args, true );
 /*
         // Return errors whenever we handle the return
 		if ( is_wp_error( $updated_post_id ) ) {
@@ -121,6 +127,23 @@ class Endpoints extends WP_REST_Controller
 			return $updated_post_id;
 		}
 */
+        } elseif ($group == 'post_thumbnail') {
+            if (!has_post_thumbnail($postId)) {
+                return false;
+            }
+
+            $thumbnailId = get_post_thumbnail_id($postId);
+
+            if ($updateFieldKey == 'post_title') {
+                $update_args = [];
+                $update_args['ID'] = $thumbnailId;
+                $update_args[$updateFieldKey] = $value;
+
+                $updatedThumbId = wp_update_post( $update_args, true );
+            } elseif ($updateFieldKey == 'alt' ) {
+                update_post_meta($thumbnailId, '_wp_attachment_image_alt', $value);
+            }
+        }
     }
 
     public function getPostByTrappId($trappId)
