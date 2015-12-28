@@ -24,6 +24,11 @@ class MetaBox
             return;
         }
 
+        // Allow attachments
+        if ($post_type == 'attachment') {
+            return;
+        }
+
         remove_meta_box('ml_box', $post_type, $context);
 
         $post_types = Mappings::postTypes();
