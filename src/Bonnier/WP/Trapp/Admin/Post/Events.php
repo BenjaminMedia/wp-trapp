@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Post;
 
 use Bonnier\WP\Trapp\Plugin;
 use Bonnier\WP\Trapp\Core\Endpoints;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Core\ServiceTranslation;
 use Bonnier\Trapp\Translation\TranslationRevision;
 use Bonnier\Trapp\Translation\TranslationField;
@@ -81,8 +82,8 @@ class Events
         }
 
         // Only specific post types
-        $post_type = 'review';
-        $post_types = apply_filters('bp_trapp_post_types', [] );
+        $post_type = get_post_type($this->postId);
+        $post_types = Mappings::postTypes();
 
         if (!in_array($post_type, $post_types)) {
             return;

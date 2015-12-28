@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp;
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Admin\Post\Events;
 use PLL_Walker_Dropdown;
 
@@ -25,7 +26,7 @@ class MetaBox
 
         remove_meta_box('ml_box', $post_type, $context);
 
-        $post_types = apply_filters('bp_trapp_post_types', [] );
+        $post_types = Mappings::postTypes();
 
         if (!in_array($post_type, $post_types)) {
             return;
