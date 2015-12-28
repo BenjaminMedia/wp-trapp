@@ -226,22 +226,7 @@ class Events
             $service->setState('state-missing');
         }
 
-        $translationGroups = [];
-        $translationGroups['post'] = [
-            'title' => 'Post',
-            'fields' => [
-                'post_title' => [
-                    'label' => 'Title',
-                    'value' => $this->post->post_title,
-                ],
-                'post_content' => [
-                    'label' => 'Body',
-                    'value' => $this->post->post_content,
-                ]
-            ]
-        ];
-
-        $translationGroups = apply_filters('bp_trapp_translation_groups', $translationGroups, $this->postId, $this->post);
+        $translationGroups = Mappings::translationGroup($this->postId, $this->post);
 
         foreach ($translationGroups as $translationGroup) {
             foreach ($translationGroup['fields'] as $field) {
@@ -318,24 +303,9 @@ class Events
             $service->setState('state-missing');
         }
 
-        $translationGroups = [];
-        $translationGroups['post'] = [
-            'title' => 'Post',
-            'fields' => [
-                'post_title' => [
-                    'label' => 'Title',
-                    'value' => $this->post->post_title,
-                ],
-                'post_content' => [
-                    'label' => 'Body',
-                    'value' => $this->post->post_content,
-                ],
-            ]
-        ];
-
-        $translationGroups = apply_filters('bp_trapp_translation_groups', $translationGroups, $this->postId, $this->post);
-        $serviceFields = $service->getFields();
         $new_fields = [];
+        $serviceFields = $service->getFields();
+        $translationGroups = Mappings::translationGroup($this->postId, $this->post);
 
         foreach ($translationGroups as $translationGroup) {
             foreach ($translationGroup['fields'] as $field) {
