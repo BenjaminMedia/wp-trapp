@@ -82,7 +82,7 @@ class Events
 
         // Only specific post types
         $post_type = 'review';
-        $post_types = [$post_type]; // TODO Filter to include more post_types
+        $post_types = apply_filters('bp_trapp_post_types', [] );
 
         if (!in_array($post_type, $post_types)) {
             return;
