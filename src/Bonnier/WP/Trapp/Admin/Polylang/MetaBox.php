@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp;
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Admin\Post\Events;
 use PLL_Walker_Dropdown;
 
@@ -19,11 +20,22 @@ class MetaBox
      */
     public static function registerMetaBox($post_type, $context)
     {
-        if ($post_type != 'review' || $context != 'side') {
+        if ($context != 'side') {
+            return;
+        }
+
+        // Allow attachments
+        if ($post_type == 'attachment') {
             return;
         }
 
         remove_meta_box('ml_box', $post_type, $context);
+
+        $post_types = Mappings::postTypes();
+
+        if (!in_array($post_type, $post_types)) {
+            return;
+        }
 
         $args = [
             'post_type' => $post_type

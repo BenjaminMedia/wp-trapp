@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Post;
 
 use Bonnier\WP\Trapp\Plugin;
 use Bonnier\WP\Trapp\Core\Endpoints;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Core\ServiceTranslation;
 use Bonnier\Trapp\Translation\TranslationRevision;
 use Bonnier\Trapp\Translation\TranslationField;
@@ -81,8 +82,8 @@ class Events
         }
 
         // Only specific post types
-        $post_type = 'review';
-        $post_types = [$post_type]; // TODO Filter to include more post_types
+        $post_type = get_post_type($this->postId);
+        $post_types = Mappings::postTypes();
 
         if (!in_array($post_type, $post_types)) {
             return;
@@ -210,6 +211,8 @@ class Events
         $service = new ServiceTranslation;
 
         $deadline = esc_attr($_POST['trapp_deadline']);
+
+        // Save Deadline
         add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
 
         $deadline = new DateTime($deadline);
@@ -227,22 +230,7 @@ class Events
             $service->setState('state-missing');
         }
 
-        $translationGroups = [];
-        $translationGroups['post'] = [
-            'title' => 'Post',
-            'fields' => [
-                'post_title' => [
-                    'label' => 'Title',
-                    'value' => $this->post->post_title,
-                ],
-                'post_content' => [
-                    'label' => 'Body',
-                    'value' => $this->post->post_content,
-                ]
-            ]
-        ];
-
-        $translationGroups = apply_filters('bp_trapp_translation_groups', $translationGroups, $this->postId, $this->post);
+        $translationGroups = Mappings::translationGroup($this->postId, $this->post);
 
         foreach ($translationGroups as $translationGroup) {
             foreach ($translationGroup['fields'] as $field) {
@@ -278,7 +266,7 @@ class Events
         // Get row data after data
         $row = $service->getRow();
 
-        // Save Trapp id
+        // Save Trapp ID
         add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
 
         // This is the first saved post and therefore master
@@ -316,24 +304,9 @@ class Events
             $service->setState('state-missing');
         }
 
-        $translationGroups = [];
-        $translationGroups['post'] = [
-            'title' => 'Post',
-            'fields' => [
-                'post_title' => [
-                    'label' => 'Title',
-                    'value' => $this->post->post_title,
-                ],
-                'post_content' => [
-                    'label' => 'Body',
-                    'value' => $this->post->post_content,
-                ],
-            ]
-        ];
-
-        $translationGroups = apply_filters('bp_trapp_translation_groups', $translationGroups, $this->postId, $this->post);
-        $serviceFields = $service->getFields();
         $new_fields = [];
+        $serviceFields = $service->getFields();
+        $translationGroups = Mappings::translationGroup($this->postId, $this->post);
 
         foreach ($translationGroups as $translationGroup) {
             foreach ($translationGroup['fields'] as $field) {
@@ -354,8 +327,8 @@ class Events
 
         if (!empty($new_fields)) {
             foreach ($new_fields as $new_field) {
-                $field = TranslationField::fromArray($field);
-                $service->addField($field);
+                $new_field = TranslationField::fromArray($new_field);
+                $service->addField($new_field);
             }
         }
 
