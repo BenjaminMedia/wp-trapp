@@ -118,26 +118,3 @@ add_filter('bp_trapp_service_development', function ($is_development) {
 
     return true;
 });
-
-add_filter('bp_trapp_post_types', function($post_types) {
-    $post_types[] = 'review';
-
-    return $post_types;
-});
-
-add_filter('bp_trapp_translation_groups', function($translationGroups) {
-    if (array_key_exists('post_thumbnail', $translationGroups)) {
-        $translationGroups['post_thumbnail']['title'] = 'Product Image';
-
-        foreach ($translationGroups['post_thumbnail']['fields'] as $key => $field) {
-            $translationGroups['post_thumbnail']['fields'][$key]['label'] = str_replace( 'Post Thumbnail', 'Product Image', $field['label'] );
-        }
-    }
-
-    return $translationGroups;
-});
-
-add_action('bp_trapp_after_save_post_thumbnail', function($translationThumbnailId, $thumbnailId) {
-    // Amazon S3
-    add_post_meta($translationThumbnailId, 'amazonS3_info', get_post_meta($thumbnailId, 'amazonS3_info', true));
-}, 10, 2);
