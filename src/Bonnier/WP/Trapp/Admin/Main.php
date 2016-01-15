@@ -18,6 +18,7 @@ class Main
         add_action('bp_pll_init', [__CLASS__, 'bpPllInit']);
         add_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
         add_action('before_delete_post', [__CLASS__, 'deletePost']);
+        add_action('load-post.php', [__CLASS__, 'loadPost']);;
 
         // Hook into plugin actions
         add_action('bp_save_trapp', [__CLASS__, 'saveTrapp'], 10, 2);
@@ -60,6 +61,10 @@ class Main
         $events->editPost();
     }
 
+    public static function loadPost() {
+        add_action('admin_notices', [__CLASS__, 'translationNotices']);
+    }
+
     /**
      * Hook listener for before_delete_post.
      *
@@ -71,6 +76,17 @@ class Main
     {
         $events = new Post\Events($postId);
         $events->deletePost();
+    }
+
+    /**
+     * Adds a notification for translations.
+     *
+     * @return void.
+     */
+    public static function translationNotices()
+    {
+        $notice = new Post\TranslationNotices();
+        $notice->registerNotice();
     }
 
     /**
