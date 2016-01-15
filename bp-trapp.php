@@ -136,3 +136,8 @@ add_filter('bp_trapp_translation_groups', function($translationGroups) {
 
     return $translationGroups;
 });
+
+add_action('bp_trapp_after_save_post_thumbnail', function($translationThumbnailId, $thumbnailId) {
+    // Amazon S3
+    add_post_meta($translationThumbnailId, 'amazonS3_info', get_post_meta($thumbnailId, 'amazonS3_info', true));
+}, 10, 2);

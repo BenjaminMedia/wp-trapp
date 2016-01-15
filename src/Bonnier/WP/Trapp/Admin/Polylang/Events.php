@@ -102,7 +102,6 @@ class Events
 
             $thumbnailId = get_post_thumbnail_id($this->post->ID);
             $thumbnailPost = get_post($thumbnailId);
-            // $new_lang = lang
 
             // Check if the translations already exists
             if ($translation = $polylang->model->get_translation('post', $thumbnailId, $language_slug)) {
@@ -121,9 +120,6 @@ class Events
             add_post_meta($translationThumbnailId, '_wp_attached_file', get_post_meta($thumbnailId, '_wp_attached_file', true));
             add_post_meta($translationThumbnailId, '_wp_attachment_image_alt', get_post_meta($thumbnailId, '_wp_attachment_image_alt', true));
 
-            // Amazon S3
-            add_post_meta($translationThumbnailId, 'amazonS3_info', get_post_meta($thumbnailId, 'amazonS3_info', true));
-
             $mediaTranslations = $polylang->model->get_translations('post', $thumbnailId);
 
             if (!$mediaTranslations && $lang = $polylang->model->get_post_language($thumbnailId)) {
@@ -134,6 +130,8 @@ class Events
 
             pll_save_post_translations($mediaTranslations);
             update_post_meta($translations[$language_slug], '_thumbnail_id', $translationThumbnailId);
+
+            do_action('bp_trapp_after_save_post_thumbnail', $translationThumbnailId, $thumbnailId);
         }
 
         pll_save_post_translations($translations);
