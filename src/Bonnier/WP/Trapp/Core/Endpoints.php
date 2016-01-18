@@ -69,6 +69,9 @@ class Endpoints extends WP_REST_Controller
         $option = get_option($name, []);
         $entry = [
             'request' => $request,
+            'time' => current_time('mysql'),
+            'trappID' => $trappId,
+            'wpPost' => $post,
             'post' => $_POST,
             'raw' => file_get_contents('php://input'),
         ];
