@@ -76,64 +76,84 @@ class Events
 
         foreach ($this->rowTranslations as $locale => $translation) {
             // Polylang is using the slug to set post languages
+            $languageSlug = current(explode('_', $locale));
 
-            $language_slug = current(explode('_', $locale));
-
-            if (!array_key_exists($language_slug, $translations)) {
+            if (!array_key_exists($languageSlug, $translations)) {
                 $lang_post_args = apply_filters('bp_trapp_save_language_post_args', [
                     'post_title' => $this->post->post_title,
                     'post_content' => $this->post->post_content,
                     'post_type' => $this->post->post_type,
-                ], $this->post, $language_slug);
+                ], $this->post, $languageSlug);
 
-                $lang_post_id = wp_insert_post($lang_post_args);
-                pll_set_post_language($lang_post_id, $language_slug);
+                $langPostId = wp_insert_post($lang_post_args);
+                pll_set_post_language($langPostId, $languageSlug);
 
-                $translations[$language_slug] = $lang_post_id;
+                $translations[$languageSlug] = $langPostId;
             }
 
             // Update the meta key
-            update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_KEY, $translation['id']);
-            update_post_meta($translations[$language_slug], Post\Events::TRAPP_META_LINK, $translation['edit_uri']);
+            update_post_meta($translations[$languageSlug], Post\Events::TRAPP_META_KEY, $translation['id']);
+            update_post_meta($translations[$languageSlug], Post\Events::TRAPP_META_LINK, $translation['edit_uri']);
 
-            if (!has_post_thumbnail($this->post->ID)) {
-                continue;
-            }
-
-            $thumbnailId = get_post_thumbnail_id($this->post->ID);
-            $thumbnailPost = get_post($thumbnailId);
-
-            // Check if the translations already exists
-            if ($translation = $polylang->model->get_translation('post', $thumbnailId, $language_slug)) {
-                update_post_meta($translations[$language_slug], '_thumbnail_id', $translation);
-            }
-
-            $translationThumbnailPost = $thumbnailPost;
-
-            // Create a new attachment
-            $translationThumbnailPost->ID = null;
-            $translationThumbnailPost->post_parent = $translations[$language_slug];
-
-            $translationThumbnailId = wp_insert_attachment($translationThumbnailPost);
-
-            add_post_meta($translationThumbnailId, '_wp_attachment_metadata', get_post_meta($thumbnailId, '_wp_attachment_metadata', true));
-            add_post_meta($translationThumbnailId, '_wp_attached_file', get_post_meta($thumbnailId, '_wp_attached_file', true));
-            add_post_meta($translationThumbnailId, '_wp_attachment_image_alt', get_post_meta($thumbnailId, '_wp_attachment_image_alt', true));
-
-            $mediaTranslations = $polylang->model->get_translations('post', $thumbnailId);
-
-            if (!$mediaTranslations && $lang = $polylang->model->get_post_language($thumbnailId)) {
-                $mediaTranslations[$lang->slug] = $thumbnailId;
-            }
-
-            $mediaTranslations[$language_slug] = $translationThumbnailId;
-
-            pll_save_post_translations($mediaTranslations);
-            update_post_meta($translations[$language_slug], '_thumbnail_id', $translationThumbnailId);
-
-            do_action('bp_trapp_after_save_post_thumbnail', $translationThumbnailId, $thumbnailId);
+            $this->saveImages($translations[$languageSlug], $languageSlug);
         }
 
         pll_save_post_translations($translations);
+    }
+
+    public function saveImages($translationId, $languageSlug) {
+        $images = [];
+
+        if (has_post_thumbnail($this->post->ID)) {
+            $thumbnailId = get_post_thumbnail_id($this->post->ID);
+            $thumbnailPost = get_post($thumbnailId);
+
+            $images['featured_image'] = [
+                'id' => $thumbnailId,
+                'post' => $thumbnailPost,
+                'type' => 'meta',
+                'key' => '_thumbnail_id',
+            ];
+        }
+
+        $images = apply_filters('bp_trapp_save_images', $images, $this->post->ID);
+
+        foreach ($images as $image) {
+            $this->saveImage($translationId, $languageSlug, $image);
+        }
+    }
+
+    public function saveImage($translationId, $languageSlug, $image) {
+        global $polylang;
+
+        // Check if the translations already exists
+        if ($translation = $polylang->model->get_translation('post', $image['id'], $languageSlug)) {
+            update_post_meta($translationId, $image['key'], $translation);
+        }
+
+        $translationImagePost = $image['post'];
+
+        // Create a new attachment
+        $translationImagePost->ID = null;
+        $translationImagePost->post_parent = $translationId;
+
+        $translationImageId = wp_insert_attachment($translationImagePost);
+
+        add_post_meta($translationImageId, '_wp_attachment_metadata', get_post_meta($image['id'], '_wp_attachment_metadata', true));
+        add_post_meta($translationImageId, '_wp_attached_file', get_post_meta($image['id'], '_wp_attached_file', true));
+        add_post_meta($translationImageId, '_wp_attachment_image_alt', get_post_meta($image['id'], '_wp_attachment_image_alt', true));
+
+        $mediaTranslations = $polylang->model->get_translations('post', $image['id']);
+
+        if (!$mediaTranslations && $lang = $polylang->model->get_post_language($image['id'])) {
+            $mediaTranslations[$lang->slug] = $image['id'];
+        }
+
+        $mediaTranslations[$languageSlug] = $translationImageId;
+
+        pll_save_post_translations($mediaTranslations);
+        update_post_meta($translationId, $image['key'], $translationImageId);
+
+        do_action('bp_trapp_after_save_post_image', $translationImageId, $image['id']);
     }
 }
