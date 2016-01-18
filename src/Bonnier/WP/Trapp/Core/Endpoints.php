@@ -35,6 +35,7 @@ class Endpoints extends WP_REST_Controller
 
         register_rest_route($namespace, '/' . self::ROUTE_UPDATE_CALLBACK, [
             'methods'             => WP_REST_Server::EDITABLE,
+            #'methods'             => WP_REST_Server::READABLE,
             'callback'            => array( $this, 'updateTrapp' ),
             'permission_callback' => array( $this, 'updateTrappPermissions' ),
         ]);
@@ -48,8 +49,6 @@ class Endpoints extends WP_REST_Controller
     // TODO Remove debug
     public function translationCallbacks()
     {
-    #    $this->htmlHeader();
-    #    ddd(get_option('bp_trapp_test_callback', array()));
         return get_option('bp_trapp_test_callback', array());
     }
 
@@ -60,6 +59,8 @@ class Endpoints extends WP_REST_Controller
 
     public function updateTrapp()
     {
+        $this->htmlHeader();
+
         $request = $this->getFromCallback();
         $trappId = $request->getId();
         $post = $this->getPostByTrappId($trappId);
@@ -100,7 +101,7 @@ class Endpoints extends WP_REST_Controller
             $label = $field->getLabel();
             $value = $field->getValue();
 
-            $this->updateField($group, $label, $value, $post->ID);
+            $this->updateField($group, $label, $value, $post);
         }
 
         $response = new WP_REST_Response( ['Success. Post Updated.'], 200 );
@@ -108,60 +109,57 @@ class Endpoints extends WP_REST_Controller
         return $response;
     }
 
-    public function updateField($group, $label, $value, $postId)
+    public function updateField($group, $label, $value, $post)
     {
-        $group = strtolower($group);
+        $translationGroups = Mappings::translationGroup($post->ID, $post);
 
-        // TODO Filter here for mappings
-        $translationGroups = [
-            'post' => [
-                'post_title' => 'Post Title',
-                'post_content' => 'Post Body',
-            ],
-            'post_thumbnail' => [
-                'post_title' => 'Post Thumbnail Title',
-                'alt' => 'Post Thumbnail Alt',
-            ],
-        ];
+        foreach ($translationGroups as $groupKey => $translationGroup) {
+            if ($translationGroup['title'] == $group) {
+                $updateGroup = $groupKey;
+                break;
+            }
+        }
 
-        if (!array_key_exists($group, $translationGroups)) {
+        if (!isset($updateGroup)) {
             return false;
         }
 
-        $groupFields = $translationGroups[$group];
-        $updateFieldKey = array_search($label, $groupFields);
+        $groupFields = $translationGroups[$updateGroup]['fields'];
+
+        foreach ($groupFields as $updateFieldKey => $groupField) {
+            if ($groupField['label'] == $label) {
+                $updateField = $groupField;
+                break;
+            }
+        }
+
+        if (!isset($updateField)) {
+            return false;
+        }
 
         if ($updateFieldKey === false) {
             return false;
         }
 
-        // Each $groupFields should have its own callback when mapping instead of this custom one
-
-        if ($group == 'post') {
+        // TODO Each $groupFields should have its own callback when mapping instead of this custom one
+        if ($updateGroup == 'post') {
             $update_args = [];
-            $update_args['ID'] = $postId;
+            $update_args['ID'] = $post->ID;
             $update_args[$updateFieldKey] = $value;
 
             // Update post
             $updated_post_id = wp_update_post( $update_args, true );
-/*
-        // Return errors whenever we handle the return
-		if ( is_wp_error( $updated_post_id ) ) {
-			if ( in_array( $updated_post_id->get_error_code(), array( 'db_update_error' ) ) ) {
-				$updated_post_id->add_data( array( 'status' => 500 ) );
-			} else {
-				$updated_post_id->add_data( array( 'status' => 400 ) );
-			}
 
-			return $updated_post_id;
-		}
-*/
-        } elseif ($group == 'post_thumbnail') {
-            if (!has_post_thumbnail($postId)) {
+            if ( is_wp_error( $updated_post_id ) ) {
                 return false;
             }
 
-            $thumbnailId = get_post_thumbnail_id($postId);
+        } elseif ($updateGroup == 'post_thumbnail') {
+            if (!has_post_thumbnail($post->ID)) {
+                return false;
+            }
+
+            $thumbnailId = get_post_thumbnail_id($post->ID);
 
             if ($updateFieldKey == 'post_title') {
                 $update_args = [];
@@ -173,6 +171,8 @@ class Endpoints extends WP_REST_Controller
                 update_post_meta($thumbnailId, '_wp_attachment_image_alt', $value);
             }
         }
+
+        return true;
     }
 
     public function getPostByTrappId($trappId)
@@ -222,6 +222,11 @@ class Endpoints extends WP_REST_Controller
     }
 
     public function getFromCallback() {
+        // TODO Delete debug
+        //$callbacks = $this->translationCallbacks();
+        //$callback = $callbacks[0];
+        //$json = $callback['raw'];
+
         $json = file_get_contents('php://input');
         $request = ServiceTranslation::fromCallback('', '', $json);
 
