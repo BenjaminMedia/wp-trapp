@@ -59,7 +59,7 @@ class Endpoints extends WP_REST_Controller
 
     public function updateTrapp()
     {
-        $this->htmlHeader();
+        #$this->htmlHeader();
 
         $request = $this->getFromCallback();
         $trappId = $request->getId();
