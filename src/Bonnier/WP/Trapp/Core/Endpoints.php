@@ -38,7 +38,21 @@ class Endpoints extends WP_REST_Controller
             'callback'            => array( $this, 'updateTrapp' ),
             'permission_callback' => array( $this, 'updateTrappPermissions' ),
         ]);
+        // TODO Remove debug
+        register_rest_route($namespace, '/translation_callbacks', [
+            'methods'             => WP_REST_Server::READABLE,
+            'callback'            => array( $this, 'translationCallbacks' ),
+        ]);
     }
+
+    // TODO Remove debug
+    public function translationCallbacks()
+    {
+    #    $this->htmlHeader();
+    #    ddd(get_option('bp_trapp_test_callback', array()));
+        return get_option('bp_trapp_test_callback', array());
+    }
+
 
     public function getNameSpace() {
         return sprintf('%s/v%d', self::PREFIX, self::VERSION);
@@ -49,6 +63,18 @@ class Endpoints extends WP_REST_Controller
         $request = $this->getFromCallback();
         $trappId = $request->getId();
         $post = $this->getPostByTrappId($trappId);
+
+        // TODO Remove debug
+        $name = 'bp_trapp_test_callback';
+        $option = get_option($name, []);
+        $entry = [
+            'request' => $request,
+            'post' => $_POST,
+            'raw' => file_get_contents('php://input'),
+        ];
+        array_unshift($option, $entry);
+        update_option($name, $option);
+        // TODO End debug
 
         if (!$post) {
             return false; // Or like "Post not found"
@@ -197,10 +223,6 @@ class Endpoints extends WP_REST_Controller
         $request = ServiceTranslation::fromCallback('', '', $json);
 
         return $request;
-    }
-
-    public function testArray() {
-        return get_option('bp_trapp_test_callback');
     }
 
     public function htmlHeader() {
