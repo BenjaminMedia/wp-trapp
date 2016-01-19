@@ -35,7 +35,7 @@ class Endpoints extends WP_REST_Controller
 
         register_rest_route($namespace, '/' . self::ROUTE_UPDATE_CALLBACK, [
             'methods'             => WP_REST_Server::EDITABLE,
-            #'methods'             => WP_REST_Server::READABLE,
+            //'methods'             => WP_REST_Server::READABLE,
             'callback'            => array( $this, 'updateTrapp' ),
             'permission_callback' => array( $this, 'updateTrappPermissions' ),
         ]);
@@ -64,6 +64,7 @@ class Endpoints extends WP_REST_Controller
         $request = $this->getFromCallback();
         $trappId = $request->getId();
         $post = $this->getPostByTrappId($trappId);
+        #$post = get_post( 1433 );
 
         // TODO Remove debug
         $name = 'bp_trapp_test_callback';
@@ -141,35 +142,40 @@ class Endpoints extends WP_REST_Controller
             return false;
         }
 
-        // TODO Each $groupFields should have its own callback when mapping instead of this custom one
-        if ($updateGroup == 'post') {
-            $update_args = [];
-            $update_args['ID'] = $post->ID;
-            $update_args[$updateFieldKey] = $value;
+        // These should exists as action callbacks
+        if ($groupField['type'] == 'wp_post') {
+            $updateArgs = [];
+            $updateArgs['ID'] = $post->ID;
+            $updateArgs[$updateFieldKey] = $value;
 
             // Update post
-            $updated_post_id = wp_update_post( $update_args, true );
+            $updatedPostId = wp_update_post($updateArgs, true);
 
-            if ( is_wp_error( $updated_post_id ) ) {
+            if ( is_wp_error($updatedPostId)) {
                 return false;
             }
 
-        } elseif ($updateGroup == 'post_thumbnail') {
+        } elseif ($groupField['type'] == 'post_thumbnail_wp_post') {die("IS");
             if (!has_post_thumbnail($post->ID)) {
                 return false;
             }
 
-            $thumbnailId = get_post_thumbnail_id($post->ID);
+            $updateArgs = [];
+            $updateArgs['ID'] = get_post_thumbnail_id($post->ID);
+            $updateArgs[$updateFieldKey] = $value;
 
-            if ($updateFieldKey == 'post_title') {
-                $update_args = [];
-                $update_args['ID'] = $thumbnailId;
-                $update_args[$updateFieldKey] = $value;
+            $updatedThumbId = wp_update_post($updateArgs, true);
 
-                $updatedThumbId = wp_update_post( $update_args, true );
-            } elseif ($updateFieldKey == 'alt' ) {
-                update_post_meta($thumbnailId, '_wp_attachment_image_alt', $value);
+            if (is_wp_error( $updatedThumbId)) {
+                return false;
             }
+
+        } elseif ($groupField['type'] == 'post_thumbnail_meta') {
+            if (!has_post_thumbnail($post->ID)) {
+                return false;
+            }
+
+            update_post_meta(get_post_thumbnail_id($post->ID), $updateFieldKey, $value);
         }
 
         return true;
