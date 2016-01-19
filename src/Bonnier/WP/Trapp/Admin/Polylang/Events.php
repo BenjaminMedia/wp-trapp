@@ -128,7 +128,7 @@ class Events
 
         // Check if the translations already exists
         if ($translation = $polylang->model->get_translation('post', $image['id'], $languageSlug)) {
-            update_post_meta($translationId, $image['key'], $translation);
+            return update_post_meta($translationId, $image['key'], $translation);
         }
 
         $translationImagePost = $image['post'];
