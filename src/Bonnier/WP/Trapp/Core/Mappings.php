@@ -21,10 +21,12 @@ class Mappings
                 'post_title' => [
                     'label' => 'Post Title',
                     'value' => $post->post_title,
+                    'type' => 'wp_post',
                 ],
                 'post_content' => [
                     'label' => 'Post Body',
                     'value' => $post->post_content,
+                    'type' => 'wp_post',
                 ]
             ]
         ];
@@ -39,15 +41,18 @@ class Mappings
                     'post_title' => [
                         'label' => 'Post Thumbnail Title',
                         'value' => $thumbnailPost->post_title,
+                        'type' => 'post_thumbnail_wp_post'
                     ],
                 ]
             ];
 
             $alt = get_post_meta($thumbnailId, '_wp_attachment_image_alt', true);
+
             if ($alt) {
                 $translationGroups['post_thumbnail']['fields']['alt'] = [
                     'label' => 'Post Thumbnail Alt',
                     'value' => $alt,
+                    'type' => 'post_thumbnail_meta',
                 ];
             }
         }
