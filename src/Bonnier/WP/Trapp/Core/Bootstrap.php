@@ -80,15 +80,15 @@ class Bootstrap
 
             return $value;
         }, 10, 4);
-//////////////////////////
-        add_filter('bp_trapp_update_post_meta_value', function($update, $post, $value, $args) {ddd($args);
+
+        add_filter('bp_trapp_update_post_meta_value', function($update, $post, $value, $args) {
             if (!array_key_exists('key', $args)) {
-                return $value;
+                return $update;
             }
 
-            $value = get_post_meta($postId, $args['key'], true);
+            $update = update_post_meta($post->ID, $args['key'], $value);
 
-            return $value;
+            return $update;
         }, 10, 4);
 
         add_filter('bp_trapp_get_image_wp_post_value', function($value, $postId, $post, $args) {
@@ -110,13 +110,13 @@ class Bootstrap
 
             return $value;
         }, 10, 4);
-////////////////////
-        add_filter('bp_trapp_update_image_wp_post_value', function($update, $post, $value, $args) {ddd($args);
+
+        add_filter('bp_trapp_update_image_wp_post_value', function($update, $post, $value, $args) {
             if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
                 return $value;
             }
 
-            $image = get_post(get_post_meta($postId, $args['image_key'], true));
+            $image = get_post(get_post_meta($post->ID, $args['image_key'], true));
 
             if (!$image) {
                 return $value;
@@ -124,11 +124,13 @@ class Bootstrap
 
             $key = $args['key'];
 
-            if (!empty($image->$key)) {
-                $value = $image->$key;
-            }
+            $updatePost['ID'] = $image->ID;
+            $updatePost[$key] = $value;
 
-            return $value;
+            // Update post
+            $update = wp_update_post($updatePost, true);
+
+            return $update;
         }, 10, 4);
 
         add_filter('bp_trapp_get_image_post_meta_value', function($update, $post, $value, $args) {
@@ -146,21 +148,21 @@ class Bootstrap
 
             return $value;
         }, 10, 4);
-///////////////////
-        add_filter('bp_trapp_update_image_post_meta_value', function($update, $post, $value, $args) {ddd($args);
+
+        add_filter('bp_trapp_update_image_post_meta_value', function($update, $post, $value, $args) {
             if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
-                return $value;
+                return $update;
             }
 
-            $image = get_post_meta($postId, $args['image_key'], true);
+            $image = get_post_meta($post->ID, $args['image_key'], true);
 
             if (!$image) {
-                return $value;
+                return $update;
             }
 
-            $value = get_post_meta($image, $args['key'], true);
+            $update = update_post_meta($image, $args['key'], $value);
 
-            return $value;
+            return $update;
         }, 10, 4);
     }
 
