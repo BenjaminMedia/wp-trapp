@@ -95,7 +95,7 @@ class Mappings
 
     public static function updateValue($type, $post, $value, $args = array()) {
         $hook = sprintf('bp_trapp_update_%s_value', $type);
-d($hook);
+
         return apply_filters($hook, false, $post, $value, $args);
     }
 }

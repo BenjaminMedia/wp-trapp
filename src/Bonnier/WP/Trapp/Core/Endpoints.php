@@ -102,9 +102,8 @@ class Endpoints extends WP_REST_Controller
             $value = $field->getValue();
 
             d($this->updateField($group, $label, $value, $post));
-            ddd('updatefield');
         }
-
+        ddd('updatedFields');
         $response = new WP_REST_Response( ['Success. Post Updated.'], 200 );
 
         return $response;
@@ -139,47 +138,6 @@ class Endpoints extends WP_REST_Controller
         }
 
         return Mappings::updateValue($updateField['type'], $post, $value, $updateField['args']);
-
-        // These should exists as action callbacks
-        switch($groupField['type']) {
-            case 'wp_post' :
-                $updateArgs = [];
-                $updateArgs['ID'] = $post->ID;
-                $updateArgs[$updateFieldKey] = $value;
-
-                // Update post
-                $updatedPostId = wp_update_post($updateArgs, true);
-
-                if ( is_wp_error($updatedPostId)) {
-                    return false;
-                }
-
-                break;
-
-            case 'post_thumbnail_wp_post' :
-                if (!has_post_thumbnail($post->ID)) {
-                    return false;
-                }
-
-                $updateArgs = [];
-                $updateArgs['ID'] = get_post_thumbnail_id($post->ID);
-                $updateArgs[$updateFieldKey] = $value;
-
-                $updatedThumbId = wp_update_post($updateArgs, true);
-
-                if (is_wp_error( $updatedThumbId)) {
-                    return false;
-                }
-
-            case 'post_thumbnail_meta' :
-                if (!has_post_thumbnail($post->ID)) {
-                    return false;
-                }
-
-                update_post_meta(get_post_thumbnail_id($post->ID), $updateFieldKey, $value);
-            }
-
-        return true;
     }
 
     public function getPostByTrappId($trappId)
