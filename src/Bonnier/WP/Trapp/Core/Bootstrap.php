@@ -34,6 +34,135 @@ class Bootstrap
         add_filter('bp_trapp_service_secret', [__CLASS__, 'serviceSecret']);
         add_filter('bp_trapp_save_app_code', [__CLASS__, 'saveAppCode']);
         add_filter('bp_trapp_save_brand_code', [__CLASS__, 'saveBrandCode']);
+
+        // TODO Default type callbacks are here for now
+        $this->filters();
+    }
+
+    public function filters() {
+        add_filter('bp_trapp_get_wp_post_value', function($value, $postId, $post, $args) {
+            if (!array_key_exists('key', $args)) {
+                return $value;
+            }
+
+            $key = $args['key'];
+
+            if (!empty($post->$key)) {
+                $value = $post->$key;
+            }
+
+            return $value;
+        }, 10, 4);
+
+        add_filter('bp_trapp_update_wp_post_value', function($update, $post, $value, $args) {
+            if (!array_key_exists('key', $args)) {
+                return $update;
+            }
+
+            $key = $args['key'];
+
+            $updatePost['ID'] = $post->ID;
+            $updatePost[$key] = $value;
+
+            // Update post
+            $update = wp_update_post($updatePost, true);
+
+            return $update;
+        }, 10, 4);
+
+        add_filter('bp_trapp_get_post_meta_value', function($value, $postId, $post, $args) {
+            if (!array_key_exists('key', $args)) {
+                return $value;
+            }
+
+            $value = get_post_meta($postId, $args['key'], true);
+
+            return $value;
+        }, 10, 4);
+
+        add_filter('bp_trapp_update_post_meta_value', function($update, $post, $value, $args) {
+            if (!array_key_exists('key', $args)) {
+                return $update;
+            }
+
+            $update = update_post_meta($post->ID, $args['key'], $value);
+
+            return $update;
+        }, 10, 4);
+
+        add_filter('bp_trapp_get_image_wp_post_value', function($value, $postId, $post, $args) {
+            if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
+                return $value;
+            }
+
+            $image = get_post(get_post_meta($postId, $args['image_key'], true));
+
+            if (!$image) {
+                return $value;
+            }
+
+            $key = $args['key'];
+
+            if (!empty($image->$key)) {
+                $value = $image->$key;
+            }
+
+            return $value;
+        }, 10, 4);
+
+        add_filter('bp_trapp_update_image_wp_post_value', function($update, $post, $value, $args) {
+            if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
+                return $value;
+            }
+
+            $image = get_post(get_post_meta($post->ID, $args['image_key'], true));
+
+            if (!$image) {
+                return $value;
+            }
+
+            $key = $args['key'];
+
+            $updatePost['ID'] = $image->ID;
+            $updatePost[$key] = $value;
+
+            // Update post
+            $update = wp_update_post($updatePost, true);
+
+            return $update;
+        }, 10, 4);
+
+        add_filter('bp_trapp_get_image_post_meta_value', function($update, $post, $value, $args) {
+            if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
+                return $value;
+            }
+
+            $image = get_post_meta($postId, $args['image_key'], true);
+
+            if (!$image) {
+                return $value;
+            }
+
+            $value = get_post_meta($image, $args['key'], true);
+
+            return $value;
+        }, 10, 4);
+
+        add_filter('bp_trapp_update_image_post_meta_value', function($update, $post, $value, $args) {
+            if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
+                return $update;
+            }
+
+            $image = get_post_meta($post->ID, $args['image_key'], true);
+
+            if (!$image) {
+                return $update;
+            }
+
+            $update = update_post_meta($image, $args['key'], $value);
+
+            return $update;
+        }, 10, 4);
     }
 
     /**
