@@ -153,9 +153,7 @@ class Events
             return;
         }
 
-        global $polylang;
-
-        $translations = $polylang->model->get_translations('post', $this->postId);
+        $translations = pll_get_post_translations($this->postId);
 
         if (empty($translations)) {
             return;
@@ -198,8 +196,6 @@ class Events
      */
     public function createTrappRevision()
     {
-        global $polylang;
-
         if (empty($_POST['trapp_tr_lang']) && !$this->hasPostTranslations()) {
             return;
         }
@@ -251,7 +247,7 @@ class Events
 
         foreach ($languages as $trapp_lang) {
             $trapp_lang = esc_attr($trapp_lang);
-            $trapp_lang = $polylang->model->get_language($trapp_lang);
+            $trapp_lang = PLL()->model->get_language($trapp_lang);
 
             if (!$trapp_lang) {
                 continue;
@@ -283,7 +279,6 @@ class Events
     public function updateTrappRevision()
     {
         // TODO Reminds alot of the insert flow so maybe merge into a common method
-        global $polylang;
 
         $service = new ServiceTranslation;
         $service = $service->getById($this->trappId);
@@ -345,7 +340,7 @@ class Events
         if (!empty($_POST['trapp_tr_lang'])) {
             foreach ($_POST['trapp_tr_lang'] as $trapp_lang => $active) {
                 $trapp_lang = esc_attr($trapp_lang);
-                $trapp_lang = $polylang->model->get_language($trapp_lang);
+                $trapp_lang = PLL()->model->get_language($trapp_lang);
 
                 if (!$trapp_lang) {
                     continue;
@@ -429,10 +424,8 @@ class Events
 
     public function getPostTranslations()
     {
-        global $polylang;
-
         $language = pll_get_post_language($this->postId);
-        $translations = $polylang->model->get_translations('post', $this->postId);
+        $translations = pll_get_post_translations($this->postId);
 
         if (array_key_exists($language, $translations)) {
             unset($translations[$language]);

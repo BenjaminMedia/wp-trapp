@@ -70,9 +70,7 @@ class Events
      */
     public function saveLanguages()
     {
-        global $polylang;
-
-        $translations = $polylang->model->get_translations('post', $this->post->ID);
+        $translations = pll_get_post_translations($this->post->ID);
 
         foreach ($this->rowTranslations as $locale => $translation) {
             // Polylang is using the slug to set post languages
@@ -124,10 +122,8 @@ class Events
     }
 
     public function saveImage($translationId, $languageSlug, $image) {
-        global $polylang;
-
         // Check if the translations already exists
-        if ($translation = $polylang->model->get_translation('post', $image['id'], $languageSlug)) {
+        if ($translation = Pll()->model->post->get_translation($image['id'], $languageSlug)) {
             return update_post_meta($translationId, $image['key'], $translation);
         }
 
@@ -143,9 +139,9 @@ class Events
         add_post_meta($translationImageId, '_wp_attached_file', get_post_meta($image['id'], '_wp_attached_file', true));
         add_post_meta($translationImageId, '_wp_attachment_image_alt', get_post_meta($image['id'], '_wp_attachment_image_alt', true));
 
-        $mediaTranslations = $polylang->model->get_translations('post', $image['id']);
+        $mediaTranslations = Pll()->model->post->get_translations($image['id']);
 
-        if (!$mediaTranslations && $lang = $polylang->model->get_post_language($image['id'])) {
+        if (!$mediaTranslations && $lang = Pll()->model->post->get_language($image['id'])) {
             $mediaTranslations[$lang->slug] = $image['id'];
         }
 
@@ -154,6 +150,6 @@ class Events
         pll_save_post_translations($mediaTranslations);
         update_post_meta($translationId, $image['key'], $translationImageId);
 
-        do_action('bp_trapp_after_save_post_image', $translationImageId, $image['id']);
+        do_action('bp_trapp_after_save_post_image', $translationImageId, $image);
     }
 }
