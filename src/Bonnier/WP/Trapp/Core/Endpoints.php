@@ -143,7 +143,7 @@ class Endpoints extends WP_REST_Controller
     public function getPostByTrappId($trappId)
     {
         $args = [
-            'post_type' => 'any', // TODO Use filter
+            'post_type' => Mappings::postTypes(),
             'post_status' => 'any',
             'meta_key' => Events::TRAPP_META_KEY,
             'meta_value' => $trappId,
