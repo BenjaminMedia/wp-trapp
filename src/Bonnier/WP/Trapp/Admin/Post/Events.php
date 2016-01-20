@@ -183,7 +183,6 @@ class Events
     public function savePost()
     {
         if ($this->hasTrappId()) {
-            ddd('update');
             $this->updateTrappRevision();
         } else {
             $this->createTrappRevision();
@@ -210,7 +209,7 @@ class Events
         $deadline = esc_attr($_POST['trapp_deadline']);
 
         // Save Deadline
-#        add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
+        add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
 
         $deadline = new DateTime($deadline);
 

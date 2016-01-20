@@ -35,10 +35,9 @@ class Bootstrap
         add_filter('bp_trapp_save_app_code', [__CLASS__, 'saveAppCode']);
         add_filter('bp_trapp_save_brand_code', [__CLASS__, 'saveBrandCode']);
 
+        // TODO Default type callbacks are here for now
         $this->filters();
     }
-
-
 
     public function filters() {
         add_filter('bp_trapp_get_wp_post_value', function($value, $postId, $post, $args) {

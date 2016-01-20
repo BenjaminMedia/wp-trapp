@@ -99,9 +99,9 @@ class Endpoints extends WP_REST_Controller
             $label = $field->getLabel();
             $value = $field->getValue();
 
-            d($this->updateField($group, $label, $value, $post));
+            $this->updateField($group, $label, $value, $post);
         }
-        ddd('updatedFields');
+
         $response = new WP_REST_Response( ['Success. Post Updated.'], 200 );
 
         return $response;
