@@ -183,6 +183,7 @@ class Events
     public function savePost()
     {
         if ($this->hasTrappId()) {
+            ddd('update');
             $this->updateTrappRevision();
         } else {
             $this->createTrappRevision();
@@ -209,7 +210,7 @@ class Events
         $deadline = esc_attr($_POST['trapp_deadline']);
 
         // Save Deadline
-        add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
+#        add_post_meta($this->postId, self::TRAPP_META_DEADLINE, $deadline);
 
         $deadline = new DateTime($deadline);
 
@@ -226,14 +227,17 @@ class Events
             $service->setState('state-missing');
         }
 
-        $translationGroups = Mappings::translationGroup($this->postId, $this->post);
+        $fieldGroups = Mappings::getFields(get_post_type($this->post));
 
-        foreach ($translationGroups as $translationGroup) {
-            foreach ($translationGroup['fields'] as $field) {
-                $field['group'] = $translationGroup['title'];
+        foreach ($fieldGroups as $fieldGroup) {
+            foreach ($fieldGroup['fields'] as $field) {
+                $field['group'] = $fieldGroup['title'];
 
-                $field = TranslationField::fromArray($field);
-                $service->addField($field);
+                $field = Mappings::translationField($field, $this->postId, $this->post);
+
+                if ( ! empty( $field ) ) {
+                    $service->addField($field);
+                }
             }
         }
 
@@ -278,8 +282,6 @@ class Events
      */
     public function updateTrappRevision()
     {
-        // TODO Reminds alot of the insert flow so maybe merge into a common method
-
         $service = new ServiceTranslation;
         $service = $service->getById($this->trappId);
 
