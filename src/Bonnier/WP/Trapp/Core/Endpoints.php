@@ -140,15 +140,21 @@ class Endpoints extends WP_REST_Controller
         return Mappings::updateValue($updateField['type'], $post, $value, $updateField['args']);
     }
 
-    public function getPostByTrappId($trappId)
+    public function getPostByTrappId($trappId = '')
     {
+        if (empty($trappId)) {
+            return false;
+        }
+
         $args = [
             'post_type' => Mappings::postTypes(),
             'post_status' => 'any',
             'meta_key' => Events::TRAPP_META_KEY,
             'meta_value' => $trappId,
             'posts_per_page' => 1,
+            'lang' => '',
         ];
+
         $query = new WP_Query($args);
 
         if ($query->have_posts()) {
