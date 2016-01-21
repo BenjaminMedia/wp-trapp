@@ -100,8 +100,21 @@ class Events
         pll_set_post_language($langPostId, $languageSlug);
 
         $this->saveImages($langPostId, $languageSlug);
+        $this->saveTerms($langPostId, $languageSlug);
 
         return $langPostId;
+    }
+
+    public function saveTerms($translationId, $languageSlug) {
+        $hook = sprintf('bp_trapp_save_%s_taxonomies', $this->post->post_type);
+        $taxonomies = apply_filters($hook, []);
+        $terms = wp_get_object_terms($this->post->ID, $taxonomies);
+
+        foreach ($terms as $term) {
+            if ($translation = Pll()->model->term->get_translation($term->term_id, $languageSlug)) {
+                wp_set_post_terms($translationId, $translation, $term->taxonomy, true);
+            }
+        }
     }
 
     public function saveImages($translationId, $languageSlug) {
