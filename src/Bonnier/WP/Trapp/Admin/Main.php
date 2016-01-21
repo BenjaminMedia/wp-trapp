@@ -57,6 +57,9 @@ class Main
      */
     public static function editPost($postId, $post)
     {
+        // To avoid infinite loops
+        remove_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
+
         $events = new Post\Events($postId, $post);
         $events->editPost();
     }

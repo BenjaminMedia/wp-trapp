@@ -91,7 +91,7 @@ class Events
 
     public function saveLanguagesPost($languageSlug) {
         $newPostArgs = apply_filters('bp_trapp_save_language_post_args', [
-            'post_title' => '',
+            'post_title' => $this->post->post_title,
             'post_content' => '',
             'post_type' => $this->post->post_type,
         ], $this->post, $languageSlug);
@@ -101,23 +101,6 @@ class Events
 
         $this->saveImages($langPostId, $languageSlug);
 
-        $fieldGroups = Mappings::getFields(get_post_type($langPostId));
-        $post = get_post($langPostId);
-// secondary image gets unset
-        foreach ($fieldGroups as $fieldGroup) {
-            foreach ($fieldGroup['fields'] as $field) {
-                $value = Mappings::getValue($field['type'], $this->post->ID, $this->post, $field['args']);
-
-                if (!empty($value)) {
-                    $update = Mappings::updateValue($field['type'], $post, $value, $field['args']);
-                }
-
-                d(Mappings::getValue($field['type'], $langPostId, $this->post, $field['args']));
-            }
-
-        }
-ddd(get_post_meta($langPostId));
-ddd(get_edit_post_link($langPostId));
         return $langPostId;
     }
 
