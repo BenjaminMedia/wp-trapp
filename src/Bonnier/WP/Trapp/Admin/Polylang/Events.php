@@ -3,6 +3,7 @@
 namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Admin\Post;
 
 class Events
@@ -77,26 +78,43 @@ class Events
             $languageSlug = current(explode('_', $locale));
 
             if (!array_key_exists($languageSlug, $translations)) {
-                $lang_post_args = apply_filters('bp_trapp_save_language_post_args', [
-                    'post_title' => $this->post->post_title,
-                    'post_content' => $this->post->post_content,
-                    'post_type' => $this->post->post_type,
-                ], $this->post, $languageSlug);
-
-                $langPostId = wp_insert_post($lang_post_args);
-                pll_set_post_language($langPostId, $languageSlug);
-
-                $translations[$languageSlug] = $langPostId;
+                $translations[$languageSlug] = $this->saveLanguagesPost($languageSlug);
             }
 
             // Update the meta key
             update_post_meta($translations[$languageSlug], Post\Events::TRAPP_META_KEY, $translation['id']);
             update_post_meta($translations[$languageSlug], Post\Events::TRAPP_META_LINK, $translation['edit_uri']);
-
-            $this->saveImages($translations[$languageSlug], $languageSlug);
         }
 
         pll_save_post_translations($translations);
+    }
+
+    public function saveLanguagesPost($languageSlug) {
+        $newPostArgs = apply_filters('bp_trapp_save_language_post_args', [
+            'post_title' => $this->post->post_title,
+            'post_content' => '',
+            'post_type' => $this->post->post_type,
+        ], $this->post, $languageSlug);
+
+        $langPostId = wp_insert_post($newPostArgs);
+        pll_set_post_language($langPostId, $languageSlug);
+
+        $this->saveImages($langPostId, $languageSlug);
+        $this->saveTerms($langPostId, $languageSlug);
+
+        return $langPostId;
+    }
+
+    public function saveTerms($translationId, $languageSlug) {
+        $hook = sprintf('bp_trapp_save_%s_taxonomies', $this->post->post_type);
+        $taxonomies = apply_filters($hook, []);
+        $terms = wp_get_object_terms($this->post->ID, $taxonomies);
+
+        foreach ($terms as $term) {
+            if ($translation = Pll()->model->term->get_translation($term->term_id, $languageSlug)) {
+                wp_set_post_terms($translationId, $translation, $term->taxonomy, true);
+            }
+        }
     }
 
     public function saveImages($translationId, $languageSlug) {

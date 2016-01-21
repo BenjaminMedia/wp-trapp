@@ -95,7 +95,13 @@ class Bootstrap
                 return $value;
             }
 
-            $image = get_post(get_post_meta($postId, $args['image_key'], true));
+            $imageId = get_post_meta($postId, $args['image_key'], true);
+
+            if (!$imageId) {
+                return $value;
+            }
+
+            $image = get_post($imageId);
 
             if (!$image) {
                 return $value;
@@ -112,10 +118,16 @@ class Bootstrap
 
         add_filter('bp_trapp_update_image_wp_post_value', function($update, $post, $value, $args) {
             if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
+                return $update;
+            }
+
+            $imageId = get_post_meta($post->ID, $args['image_key'], true);
+
+            if (!$imageId) {
                 return $value;
             }
 
-            $image = get_post(get_post_meta($post->ID, $args['image_key'], true));
+            $image = get_post($imageId);
 
             if (!$image) {
                 return $value;
@@ -132,7 +144,7 @@ class Bootstrap
             return $update;
         }, 10, 4);
 
-        add_filter('bp_trapp_get_image_post_meta_value', function($update, $post, $value, $args) {
+        add_filter('bp_trapp_get_image_post_meta_value', function($value, $postId, $post, $args) {
             if (!array_key_exists('image_key', $args) || !array_key_exists('key', $args)) {
                 return $value;
             }

@@ -3,18 +3,27 @@
 namespace Bonnier\WP\Trapp\Admin\Post;
 
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Admin\Post\Events;
 
 class TranslationNotices
 {
     public function registerNotice()
     {
-        $is_master = get_post_meta(get_the_ID(), Events::TRAPP_META_MASTER, true);
+        $postType = get_post_type();
 
-        if ($is_master) {
+        if (!in_array($postType, Mappings::postTypes())) {
             return;
         }
 
+        $is_master = get_post_meta(get_the_ID(), Events::TRAPP_META_MASTER, true);
+        $has_trapp_key = get_post_meta(get_the_ID(), Events::TRAPP_META_KEY, true);
+
+        if ($is_master || !$has_trapp_key) {
+            return;
+        }
+
+        $fieldGroups = Mappings::getFields($postType);
         $translation_link = get_post_meta(get_the_ID(), Events::TRAPP_META_LINK, true);
         $link_text = sprintf('<a href="%s" target="_blank"><strong>TRAPP</strong></a>', esc_url($translation_link));
 
@@ -29,9 +38,11 @@ class TranslationNotices
 
             $notice .= '<p>';
                 $notice .= '<ul>';
-                    $notice .= '<li><strong>- Title</strong></li>';
-                    $notice .= '<li><strong>- Name/Slug</strong></li>';
-                    $notice .= '<li><strong>- Body</strong></li>';
+                    foreach ($fieldGroups as $fieldGroup) {
+                        foreach ($fieldGroup['fields'] as $field ) {
+                            $notice .= sprintf( '<li><strong>- %s</strong></li>', $field['label'] );
+                        }
+                    }
                 $notice .= '</ul>';
             $notice .= '</p>';
 
