@@ -177,13 +177,11 @@ class Main
             return;
         }
 
-        global $polylang;
-
-        if (!$polylang->model->get_post_language($postId)) {
+        if (!Pll()->model->post->get_language($postId)) {
             return;
         }
 
         // We will handle the translations instead of Polylang
-        remove_action('save_post', array($polylang->filters_post, 'save_post'), 21, 3);
+        remove_action('save_post', array(Pll()->filters_post, 'save_post'), 21, 3);
     }
 }
