@@ -302,15 +302,20 @@ class Events
 
         $new_fields = [];
         $serviceFields = $service->getFields();
-        $translationGroups = Mappings::translationGroup($this->postId, $this->post);
+        $fieldGroups = Mappings::getFields(get_post_type($this->post));
 
-        foreach ($translationGroups as $translationGroup) {
-            foreach ($translationGroup['fields'] as $field) {
-                $field['group'] = $translationGroup['title'];
+        foreach ($fieldGroups as $fieldGroup) {
+            foreach ($fieldGroup['fields'] as $field) {
+                $field['group'] = $fieldGroup['title'];
 
                 foreach ($serviceFields as $fieldId => $serviceField) {
                     if ($field['label'] == $serviceField->getLabel()) {
-                        $serviceFields[$fieldId]->setValue($field['value']);
+                        $value = Mappings::getValue($field['type'], $this->postId, $this->post, $field['args']);
+
+                        if (!empty($value)) {
+                            $serviceFields[$fieldId]->setValue($value);
+                        }
+
                         continue 2;
                     }
                 }
@@ -323,8 +328,11 @@ class Events
 
         if (!empty($new_fields)) {
             foreach ($new_fields as $new_field) {
-                $new_field = TranslationField::fromArray($new_field);
-                $service->addField($new_field);
+                $field = Mappings::translationField($field, $this->postId, $this->post);
+
+                if ( ! empty( $field ) ) {
+                    $service->addField($field);
+                }
             }
         }
 

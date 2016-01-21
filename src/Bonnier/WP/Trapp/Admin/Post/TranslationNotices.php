@@ -17,8 +17,9 @@ class TranslationNotices
         }
 
         $is_master = get_post_meta(get_the_ID(), Events::TRAPP_META_MASTER, true);
+        $has_trapp_key = get_post_meta(get_the_ID(), Events::TRAPP_META_KEY, true);
 
-        if ($is_master) {
+        if ($is_master || !$has_trapp_key) {
             return;
         }
 

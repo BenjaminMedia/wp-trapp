@@ -3,6 +3,7 @@
 namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Admin\Post;
 
 class Events
@@ -77,26 +78,47 @@ class Events
             $languageSlug = current(explode('_', $locale));
 
             if (!array_key_exists($languageSlug, $translations)) {
-                $lang_post_args = apply_filters('bp_trapp_save_language_post_args', [
-                    'post_title' => $this->post->post_title,
-                    'post_content' => $this->post->post_content,
-                    'post_type' => $this->post->post_type,
-                ], $this->post, $languageSlug);
-
-                $langPostId = wp_insert_post($lang_post_args);
-                pll_set_post_language($langPostId, $languageSlug);
-
-                $translations[$languageSlug] = $langPostId;
+                $translations[$languageSlug] = $this->saveLanguagesPost($languageSlug);
             }
 
             // Update the meta key
             update_post_meta($translations[$languageSlug], Post\Events::TRAPP_META_KEY, $translation['id']);
             update_post_meta($translations[$languageSlug], Post\Events::TRAPP_META_LINK, $translation['edit_uri']);
-
-            $this->saveImages($translations[$languageSlug], $languageSlug);
         }
 
         pll_save_post_translations($translations);
+    }
+
+    public function saveLanguagesPost($languageSlug) {
+        $newPostArgs = apply_filters('bp_trapp_save_language_post_args', [
+            'post_title' => '',
+            'post_content' => '',
+            'post_type' => $this->post->post_type,
+        ], $this->post, $languageSlug);
+
+        $langPostId = wp_insert_post($newPostArgs);
+        pll_set_post_language($langPostId, $languageSlug);
+
+        $this->saveImages($langPostId, $languageSlug);
+
+        $fieldGroups = Mappings::getFields(get_post_type($langPostId));
+        $post = get_post($langPostId);
+// secondary image gets unset
+        foreach ($fieldGroups as $fieldGroup) {
+            foreach ($fieldGroup['fields'] as $field) {
+                $value = Mappings::getValue($field['type'], $this->post->ID, $this->post, $field['args']);
+
+                if (!empty($value)) {
+                    $update = Mappings::updateValue($field['type'], $post, $value, $field['args']);
+                }
+
+                d(Mappings::getValue($field['type'], $langPostId, $this->post, $field['args']));
+            }
+
+        }
+ddd(get_post_meta($langPostId));
+ddd(get_edit_post_link($langPostId));
+        return $langPostId;
     }
 
     public function saveImages($translationId, $languageSlug) {
