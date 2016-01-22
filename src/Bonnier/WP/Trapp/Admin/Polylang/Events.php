@@ -92,7 +92,7 @@ class Events
     public function saveLanguagesPost($languageSlug) {
         $newPostArgs = apply_filters('bp_trapp_save_language_post_args', [
             'post_title' => $this->post->post_title,
-            'post_content' => '',
+            'post_content' => $this->post->post_content,
             'post_type' => $this->post->post_type,
         ], $this->post, $languageSlug);
 
