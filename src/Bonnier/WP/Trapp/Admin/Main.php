@@ -66,6 +66,20 @@ class Main
 
     public static function loadPost() {
         add_action('admin_notices', [__CLASS__, 'translationNotices']);
+        add_filter('wp_insert_post_data', [ __CLASS__, 'insertPostData']);
+        add_filter('update_post_metadata', [ __CLASS__, 'updatePostMetadata'], 10, 3);
+    }
+
+    public static function insertPostData($data) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterInsertPostData($data);
+    }
+
+    public static function updatePostMetadata($check, $objectId, $metaKey) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterUpdatePostMetadata($check, $objectId, $metaKey);
     }
 
     /**
