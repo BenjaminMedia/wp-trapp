@@ -31,6 +31,29 @@ class FieldLocker
         return $data;
     }
 
+    public function readOnlyTinyMce() {
+        if ( ! $this->isTranslation() ) {
+            return $data;
+        }
+
+        if ($this->getFieldByType('wp_post', 'post_content')) {
+            add_filter( 'tiny_mce_before_init', function( $args ) {
+
+                $args['readonly'] = 1;
+
+                return $args;
+            } );
+
+            add_filter( 'wp_editor_settings', function( $settings ) {
+
+                $settings['media_buttons'] = false;
+
+                return $settings;
+            } );
+        }
+
+    }
+
     public function filterUpdatePostMetadata($check, $objectId, $metaKey)
     {
         if ( ! $this->isTranslation() ) {

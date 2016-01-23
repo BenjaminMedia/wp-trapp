@@ -66,8 +66,12 @@ class Main
 
     public static function loadPost() {
         add_action('admin_notices', [__CLASS__, 'translationNotices']);
+        add_action('admin_init', [__CLASS__, 'readOnlyTinyMce']);
         add_filter('wp_insert_post_data', [ __CLASS__, 'insertPostData']);
         add_filter('update_post_metadata', [ __CLASS__, 'updatePostMetadata'], 10, 3);
+
+        $fieldLocker = new Post\FieldLocker();
+        $fieldLocker->readOnlyTinyMce();
     }
 
     public static function insertPostData($data) {

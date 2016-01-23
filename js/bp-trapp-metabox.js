@@ -8,3 +8,10 @@ jQuery(document).ready(function($) {
         }
     );
 });
+
+jQuery(document).ready(function($) {
+    $('#title').prop('disabled', true);
+    $('input[name="model"]').prop('disabled', true);
+    $('input[name="yoast_wpseo_focuskw_text_input"]').prop('disabled', true);
+
+});
