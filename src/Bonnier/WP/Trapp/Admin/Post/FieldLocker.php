@@ -33,7 +33,7 @@ class FieldLocker
 
     public function readOnlyTinyMce() {
         if ( ! $this->isTranslation() ) {
-            return $data;
+            return;
         }
 
         if ($this->getFieldByType('wp_post', 'post_content')) {
