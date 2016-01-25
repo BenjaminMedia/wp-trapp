@@ -51,13 +51,13 @@ class Endpoints extends WP_REST_Controller
         $post = $this->getPostByTrappId($trappId);
 
         if (!$post) {
-            return false; // Or like "Post not found"
+            return false;
         }
 
         $is_master = get_post_meta($post->ID, Events::TRAPP_META_MASTER, true );
 
         if ($is_master) {
-            return false; // Or like "Master translation cannot get updated"
+            return false;
         }
 
         if ($request->getState() != 'state-translated') {
