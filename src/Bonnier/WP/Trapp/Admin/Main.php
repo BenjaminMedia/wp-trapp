@@ -66,6 +66,50 @@ class Main
 
     public static function loadPost() {
         add_action('admin_notices', [__CLASS__, 'translationNotices']);
+        add_filter('wp_insert_post_data', [__CLASS__, 'insertPostData']);
+        add_filter('update_post_metadata', [__CLASS__, 'updatePostMetadata'], 10, 3);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueLockFields']);
+        add_filter('in_admin_header', [__CLASS__, 'setLockedFields']);
+        add_filter('bp_trapp_locked_field', [__CLASS__, 'filterLockedFields'], 10, 2);
+    }
+
+    /**
+     * Adds a notification for translations.
+     *
+     * @return void.
+     */
+    public static function translationNotices()
+    {
+        $notice = new Post\TranslationNotices();
+        $notice->registerNotice();
+    }
+
+    public static function insertPostData($data) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterInsertPostData($data);
+    }
+
+    public static function updatePostMetadata($check, $objectId, $metaKey) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterUpdatePostMetadata($check, $objectId, $metaKey);
+    }
+
+    public static function enqueueLockFields() {
+        $fieldLocker = new Post\FieldLocker();
+        $fieldLocker->enqueueLockFields();
+    }
+
+    public static function setLockedFields() {
+        $fieldLocker = new Post\FieldLocker();
+        $fieldLocker->setLockedFields();
+    }
+
+    public static function filterLockedFields($return, $field) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterLockedFields($return, $field);
     }
 
     /**
@@ -79,17 +123,6 @@ class Main
     {
         $events = new Post\Events($postId);
         $events->deletePost();
-    }
-
-    /**
-     * Adds a notification for translations.
-     *
-     * @return void.
-     */
-    public static function translationNotices()
-    {
-        $notice = new Post\TranslationNotices();
-        $notice->registerNotice();
     }
 
     /**
