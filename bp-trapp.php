@@ -5,7 +5,7 @@
  * Plugin Name:       BP WP TRAPP
  * Plugin URI:        https://github.com/BenjaminMedia/wp-trapp
  * Description:       Send content to the TRAPP translation service.
- * Version:           0.1.1
+ * Version:           0.1.2
  * Text Domain:       bp-trapp
  * Domain Path:       /languages
  */
