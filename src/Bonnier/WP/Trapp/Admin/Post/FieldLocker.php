@@ -2,6 +2,7 @@
 
 namespace Bonnier\WP\Trapp\Admin\Post;
 
+use Bonnier\WP\Trapp;
 use Bonnier\WP\Trapp\Core\Mappings;
 
 class FieldLocker
@@ -31,27 +32,72 @@ class FieldLocker
         return $data;
     }
 
-    public function readOnlyTinyMce() {
+    public function setLockedFields() {
         if ( ! $this->isTranslation() ) {
             return;
         }
 
-        if ($this->getFieldByType('wp_post', 'post_content')) {
-            add_filter( 'tiny_mce_before_init', function( $args ) {
+        $fields = [];
 
-                $args['readonly'] = 1;
+        $fieldGroups = Mappings::getFields(get_post_type());
 
-                return $args;
-            } );
+        foreach ($fieldGroups as $fieldGroup) {
+            foreach ($fieldGroup['fields'] as $field ) {
+                $lockedField = apply_filters('bp_trapp_locked_field', '', $field);
 
-            add_filter( 'wp_editor_settings', function( $settings ) {
-
-                $settings['media_buttons'] = false;
-
-                return $settings;
-            } );
+                if (!empty($lockedField)) {
+                    $fields[] = trim($lockedField);
+                }
+            }
         }
 
+        $fields = array_unique($fields);
+
+        printf('<div id="bp-trapp-locked-fields" data-fields="%s"></div>', implode(' ', $fields));
+    }
+
+    public function enqueueLockFields() {
+        if ( ! $this->isTranslation() ) {
+            return;
+        }
+
+        $src = Trapp\instance()->plugin_url . 'js/bp-trapp-lock-fields.js';
+        $deps = [
+            'jquery'
+        ];
+
+        wp_enqueue_script('bp-trapp-metabox', $src, $deps);
+    }
+
+    public function filterLockedFields($return, $field) {
+        switch($field['type']) {
+            case 'post_meta':
+                $return = $field['args']['key'];
+                break;
+
+            case 'wp_post':
+                if ($field['args']['key'] == 'post_title') {
+                    $return = $field['args']['key'];
+                } elseif ($field['args']['key'] == 'post_content') {
+                    add_filter('tiny_mce_before_init', [$this, 'disableEditorInit']);
+                    add_filter('wp_editor_settings', [$this, 'disableEditorRich']);
+                }
+        }
+
+        return $return;
+    }
+
+    public function disableEditorInit($args) {
+        $args['readonly'] = 1;
+
+        return $args;
+    }
+
+    public function disableEditorRich($settings) {
+        $settings['media_buttons'] = false;
+        $settings['quicktags'] = false;
+
+        return $settings;
     }
 
     public function filterUpdatePostMetadata($check, $objectId, $metaKey)
