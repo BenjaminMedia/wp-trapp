@@ -23,7 +23,6 @@ class TranslationNotices
             return;
         }
 
-        $fieldGroups = Mappings::getFields($postType);
         $translation_link = get_post_meta(get_the_ID(), Events::TRAPP_META_LINK, true);
         $link_text = sprintf('<a href="%s" target="_blank"><strong>TRAPP</strong></a>', esc_url($translation_link));
 
@@ -32,18 +31,6 @@ class TranslationNotices
             $notice .= '<p>';
                 $notice .= sprintf('<strong>%s:</strong><br>', __('Warning', Plugin::TEXT_DOMAIN));
                 $notice .= sprintf(__('This is a translation found inside the TRAPP service and should get updated in %s instead.', Plugin::TEXT_DOMAIN), $link_text);
-                $notice .= '<br>';
-                $notice .= sprintf(__('These fields cannot be updated inside of this application:', Plugin::TEXT_DOMAIN), $link_text);
-            $notice .= '</p>';
-
-            $notice .= '<p>';
-                $notice .= '<ul>';
-                    foreach ($fieldGroups as $fieldGroup) {
-                        foreach ($fieldGroup['fields'] as $field ) {
-                            $notice .= sprintf( '<li><strong>- %s</strong></li>', $field['label'] );
-                        }
-                    }
-                $notice .= '</ul>';
             $notice .= '</p>';
 
         $notice .= '</div>';
