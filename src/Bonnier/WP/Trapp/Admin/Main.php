@@ -18,6 +18,7 @@ class Main
         add_action('bp_pll_init', [__CLASS__, 'bpPllInit']);
         add_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
         add_action('before_delete_post', [__CLASS__, 'deletePost']);
+        add_action('load-post.php', [__CLASS__, 'loadPost']);;
 
         // Hook into plugin actions
         add_action('bp_save_trapp', [__CLASS__, 'saveTrapp'], 10, 2);
@@ -56,8 +57,59 @@ class Main
      */
     public static function editPost($postId, $post)
     {
+        // To avoid infinite loops
+        remove_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
+
         $events = new Post\Events($postId, $post);
         $events->editPost();
+    }
+
+    public static function loadPost() {
+        add_action('admin_notices', [__CLASS__, 'translationNotices']);
+        add_filter('wp_insert_post_data', [__CLASS__, 'insertPostData']);
+        add_filter('update_post_metadata', [__CLASS__, 'updatePostMetadata'], 10, 3);
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueueLockFields']);
+        add_filter('in_admin_header', [__CLASS__, 'setLockedFields']);
+        add_filter('bp_trapp_locked_field', [__CLASS__, 'filterLockedFields'], 10, 2);
+    }
+
+    /**
+     * Adds a notification for translations.
+     *
+     * @return void.
+     */
+    public static function translationNotices()
+    {
+        $notice = new Post\TranslationNotices();
+        $notice->registerNotice();
+    }
+
+    public static function insertPostData($data) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterInsertPostData($data);
+    }
+
+    public static function updatePostMetadata($check, $objectId, $metaKey) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterUpdatePostMetadata($check, $objectId, $metaKey);
+    }
+
+    public static function enqueueLockFields() {
+        $fieldLocker = new Post\FieldLocker();
+        $fieldLocker->enqueueLockFields();
+    }
+
+    public static function setLockedFields() {
+        $fieldLocker = new Post\FieldLocker();
+        $fieldLocker->setLockedFields();
+    }
+
+    public static function filterLockedFields($return, $field) {
+        $fieldLocker = new Post\FieldLocker();
+
+        return $fieldLocker->filterLockedFields($return, $field);
     }
 
     /**
@@ -161,13 +213,11 @@ class Main
             return;
         }
 
-        global $polylang;
-
-        if (!$polylang->model->get_post_language($postId)) {
+        if (!Pll()->model->post->get_language($postId)) {
             return;
         }
 
         // We will handle the translations instead of Polylang
-        remove_action('save_post', array($polylang->filters_post, 'save_post'), 21, 3);
+        remove_action('save_post', array(Pll()->filters_post, 'save_post'), 21, 3);
     }
 }

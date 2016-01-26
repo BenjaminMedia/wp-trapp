@@ -4,6 +4,7 @@ namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp;
 use Bonnier\WP\Trapp\Plugin;
+use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Admin\Post\Events;
 use PLL_Walker_Dropdown;
 
@@ -19,11 +20,22 @@ class MetaBox
      */
     public static function registerMetaBox($post_type, $context)
     {
-        if ($post_type != 'review' || $context != 'side') {
+        if ($context != 'side') {
+            return;
+        }
+
+        // Allow attachments
+        if ($post_type == 'attachment') {
             return;
         }
 
         remove_meta_box('ml_box', $post_type, $context);
+
+        $post_types = Mappings::postTypes();
+
+        if (!in_array($post_type, $post_types)) {
+            return;
+        }
 
         $args = [
             'post_type' => $post_type
@@ -43,21 +55,19 @@ class MetaBox
      */
     public static function polylangMetaBoxRender($post, $metabox)
     {
-        global $polylang;
-
         $post_id = $post->ID;
         $post_type = $metabox['args']['post_type'];
 
-        if ($lg = $polylang->model->get_post_language($post_id)) {
+        if ($lg = PLL()->model->post->get_language($post_id)) {
             $lang = $lg;
         } elseif (!empty($_GET['new_lang'])) {
-            $lang = $polylang->model->get_language($_GET['new_lang']);
+            $lang = PLL()->model->get_language($_GET['new_lang']);
         } else {
-            $lang = $polylang->pref_lang;
+            $lang = PLL()->pref_lang;
         }
 
         $text_domain = Plugin::TEXT_DOMAIN;
-        $languages = $polylang->model->get_languages_list();
+        $languages = PLL()->model->get_languages_list();
         $pll_dropdown = new PLL_Walker_Dropdown();
         $dropdown = $pll_dropdown->walk($languages, array(
             'name'     => 'post_lang_choice',
@@ -69,7 +79,7 @@ class MetaBox
         $masterLink = '';
 
         foreach ($languages as $language) {
-            $languagePost = $polylang->model->get_translation('post', $post_id, $language);
+            $languagePost = PLL()->model->post->get_translation($post_id, $language);
 
             if (!$languagePost) {
                 continue;

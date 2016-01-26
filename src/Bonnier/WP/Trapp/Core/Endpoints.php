@@ -51,13 +51,13 @@ class Endpoints extends WP_REST_Controller
         $post = $this->getPostByTrappId($trappId);
 
         if (!$post) {
-            return false; // Or like "Post not found"
+            return false;
         }
 
         $is_master = get_post_meta($post->ID, Events::TRAPP_META_MASTER, true );
 
         if ($is_master) {
-            return false; // Or like "Master translation cannot get updated"
+            return false;
         }
 
         if ($request->getState() != 'state-translated') {
@@ -71,7 +71,7 @@ class Endpoints extends WP_REST_Controller
             $label = $field->getLabel();
             $value = $field->getValue();
 
-            $this->updateField($group, $label, $value, $post->ID);
+            $this->updateField($group, $label, $value, $post);
         }
 
         $response = new WP_REST_Response( ['Success. Post Updated.'], 200 );
@@ -79,59 +79,52 @@ class Endpoints extends WP_REST_Controller
         return $response;
     }
 
-    public function updateField($group, $label, $value, $post_id)
+    public function updateField($group, $label, $value, $post)
     {
-        $group = strtolower($group);
+        $fieldGroups = Mappings::getFields(get_post_type($post));
 
-        // TODO Filter here for mappings
-        $translationGroups = [];
-        $translationGroups['post'] = [
-            'post_title' => 'Title',
-            'post_content' => 'Body',
-        ];
+        foreach ($fieldGroups as $groupKey => $fieldGroup) {
+            if ($fieldGroup['title'] == $group) {
+                $updateGroup = $groupKey;
+                break;
+            }
+        }
 
-        if (!array_key_exists($group, $translationGroups)) {
+        if (!isset($updateGroup)) {
             return false;
         }
 
-        $groupFields = $translationGroups[$group];
-        $updateFieldKey = array_search($label, $groupFields);
+        $groupFields = $fieldGroups[$updateGroup]['fields'];
 
-        if ($updateFieldKey === false) {
+        foreach ($groupFields as $groupField) {
+            if ($groupField['label'] == $label) {
+                $updateField = $groupField;
+                break;
+            }
+        }
+
+        if (!isset($updateField)) {
             return false;
         }
 
-        // Each $groupFields should have its own callback when mapping instead of this custom one
-
-        $update_args = [];
-        $update_args['ID'] = $post_id;
-        $update_args[$updateFieldKey] = $value;
-
-        // Update post
-        $updated_post_id = wp_update_post( $update_args, true );
-/*
-        // Return errors whenever we handle the return
-		if ( is_wp_error( $updated_post_id ) ) {
-			if ( in_array( $updated_post_id->get_error_code(), array( 'db_update_error' ) ) ) {
-				$updated_post_id->add_data( array( 'status' => 500 ) );
-			} else {
-				$updated_post_id->add_data( array( 'status' => 400 ) );
-			}
-
-			return $updated_post_id;
-		}
-*/
+        return Mappings::updateValue($updateField['type'], $post, $value, $updateField['args']);
     }
 
-    public function getPostByTrappId($trappId)
+    public function getPostByTrappId($trappId = '')
     {
+        if (empty($trappId)) {
+            return false;
+        }
+
         $args = [
-            'post_type' => 'any', // TODO Use filter
+            'post_type' => Mappings::postTypes(),
             'post_status' => 'any',
             'meta_key' => Events::TRAPP_META_KEY,
             'meta_value' => $trappId,
             'posts_per_page' => 1,
+            'lang' => '',
         ];
+
         $query = new WP_Query($args);
 
         if ($query->have_posts()) {
@@ -174,10 +167,6 @@ class Endpoints extends WP_REST_Controller
         $request = ServiceTranslation::fromCallback('', '', $json);
 
         return $request;
-    }
-
-    public function testArray() {
-        return get_option('bp_trapp_test_callback');
     }
 
     public function htmlHeader() {

@@ -5,7 +5,7 @@
  * Plugin Name:       BP WP TRAPP
  * Plugin URI:        https://github.com/BenjaminMedia/wp-trapp
  * Description:       Send content to the TRAPP translation service.
- * Version:           0.1.1
+ * Version:           0.2.0
  * Text Domain:       bp-trapp
  * Domain Path:       /languages
  */
@@ -105,16 +105,3 @@ function instance()
     return Plugin::instance();
 }
 add_action('plugins_loaded', __NAMESPACE__ . '\instance', 0);
-
-// How to set development true? Possible create a small plugin for this filter
-add_filter('bp_trapp_service_development', function ($is_development) {
-    if (!defined('APP_ENV')) {
-        return $is_development;
-    }
-
-    if (APP_ENV == 'production') {
-        return false;
-    }
-
-    return true;
-});
