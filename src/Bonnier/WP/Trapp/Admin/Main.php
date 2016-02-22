@@ -41,7 +41,7 @@ class Main
      */
     public static function bpPllInit()
     {
-        add_action('edit_post', [__CLASS__, 'removeSavePost']);
+        add_action('save_post', [__CLASS__, 'removeSavePost']);
         add_action('do_meta_boxes', [__CLASS__, 'polylangMetaBox'], 10, 2);
         add_action('bp_trapp_after_save_post', [__CLASS__, 'polylangCreateLanguages'], 10, 2);
         add_action('bp_after_delete_trapp', [__CLASS__, 'polylangDeleteTrapp']);
