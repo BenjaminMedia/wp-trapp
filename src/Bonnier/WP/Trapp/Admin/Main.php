@@ -213,11 +213,9 @@ class Main
             return;
         }
 
-        if (!Pll()->model->post->get_language($postId)) {
-            return;
+        if (empty($_POST['post_lang_choice'])) {
+            // We will handle the translations instead of Polylang
+            remove_action('save_post', array(Pll()->filters_post, 'save_post'), 21, 3);
         }
-
-        // We will handle the translations instead of Polylang
-        remove_action('save_post', array(Pll()->filters_post, 'save_post'), 21, 3);
     }
 }
