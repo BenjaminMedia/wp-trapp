@@ -3,10 +3,8 @@
 namespace Bonnier\WP\Trapp\Admin\Polylang;
 
 use Bonnier\WP\Trapp;
-use Bonnier\WP\Trapp\Plugin;
 use Bonnier\WP\Trapp\Core\Endpoints;
 use Bonnier\WP\Trapp\Core\Mappings;
-use Bonnier\WP\Trapp\Admin\Post\Events;
 
 class Columns
 {
