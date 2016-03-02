@@ -109,6 +109,10 @@ class Bootstrap
 
         $values = get_post_meta($postId, $args['key'], true);
 
+        if (!$values) {
+            return $values;
+        }
+
         foreach ($values as $key => $value) {
             if (empty($value)) {
                 unset($values[$key]);
