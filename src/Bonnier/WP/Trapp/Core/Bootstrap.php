@@ -39,6 +39,8 @@ class Bootstrap
         add_filter('bp_trapp_update_wp_post_value', [__CLASS__, 'filterUpdateWpPost'], 10, 4);
         add_filter('bp_trapp_get_post_meta_value', [__CLASS__, 'filterGetPostMeta'], 10, 4);
         add_filter('bp_trapp_update_post_meta_value', [__CLASS__, 'filterUpdatePostMeta'], 10, 4);
+        add_filter('bp_trapp_get_post_meta_array_value', [__CLASS__, 'filterGetPostMetaArray'], 10, 4);
+        add_filter('bp_trapp_update_post_meta_array_value', [__CLASS__, 'filterUpdatePostMetaArray'], 10, 4);
         add_filter('bp_trapp_get_image_wp_post_value', [__CLASS__, 'filterGetImageWpPost'], 10, 4);
         add_filter('bp_trapp_update_image_wp_post_value', [__CLASS__, 'filterUpdateImageWpPost'], 10, 4);
         add_filter('bp_trapp_get_image_post_meta_value', [__CLASS__, 'filterGetImagePostMeta'], 10, 4);
@@ -95,6 +97,50 @@ class Bootstrap
         }
 
         $update = update_post_meta($post->ID, $args['key'], $value);
+
+        return $update;
+    }
+
+    public static function filterGetPostMetaArray($value, $postId, $post, $args)
+    {
+        if (!array_key_exists('key', $args)) {
+            return $value;
+        }
+
+        $values = get_post_meta($postId, $args['key'], true);
+
+        if (!$values) {
+            return $values;
+        }
+
+        foreach ($values as $key => $value) {
+            if (empty($value)) {
+                unset($values[$key]);
+            }
+        }
+
+        return $values;
+    }
+
+    public static function filterUpdatePostMetaArray($update, $post, $value, $args)
+    {
+        $args = apply_filters('bp_trapp_update_post_meta_array_args', $args, $post );
+
+        if (!array_key_exists('key', $args)) {
+            return $update;
+        }
+
+        $values = get_post_meta($post->ID, $args['key'], true);
+
+        if (!is_array($values)) {
+            $values = [];
+        }
+
+        $arrayKey = $args['array_key'];
+
+        $values[$arrayKey] = $value;
+
+        $update = update_post_meta($post->ID, $args['key'], $values);
 
         return $update;
     }
