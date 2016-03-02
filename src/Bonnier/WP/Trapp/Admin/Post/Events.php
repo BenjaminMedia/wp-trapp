@@ -306,7 +306,7 @@ class Events
             $service->setState('state-missing');
         }
 
-        $new_fields = [];
+        $newFields = [];
         $serviceFields = $service->getFields();
         $fieldGroups = Mappings::getFields(get_post_type($this->post));
 
@@ -326,15 +326,15 @@ class Events
                     }
                 }
 
-                $new_fields[] = $field;
+                $newFields[] = $field;
             }
         }
 
         $service->setFields($serviceFields);
 
-        if (!empty($new_fields)) {
-            foreach ($new_fields as $new_field) {
-                $field = Mappings::translationField($field, $this->postId, $this->post);
+        if (!empty($newFields)) {
+            foreach ($newFields as $newField) {
+                $field = Mappings::translationField($newField, $this->postId, $this->post);
 
                 if ( ! empty( $field ) ) {
                     $service->addField($field);
