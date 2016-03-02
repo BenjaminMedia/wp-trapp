@@ -17,6 +17,11 @@ class Endpoints extends WP_REST_Controller
     const PREFIX = 'bp/trapp';
 
     /**
+     * The Trapp translated meta key.
+     */
+    const TRAPP_META_TRANSLATED = 'bp_trapp_translated';
+
+    /**
      * The namespace version.
      */
     const VERSION = '1';
@@ -74,6 +79,8 @@ class Endpoints extends WP_REST_Controller
             $this->updateField($group, $label, $value, $post);
         }
 
+        update_post_meta($post->ID, self::TRAPP_META_TRANSLATED, 1);
+
         $response = new WP_REST_Response( ['Success. Post Updated.'], 200 );
 
         return $response;
@@ -97,9 +104,13 @@ class Endpoints extends WP_REST_Controller
         $groupFields = $fieldGroups[$updateGroup]['fields'];
 
         foreach ($groupFields as $groupField) {
+
             if ($groupField['label'] == $label) {
                 $updateField = $groupField;
                 break;
+            } elseif ($group == $groupField['label']) {
+                $updateField = $groupField;
+                $updateField['args']['array_key'] = $label;
             }
         }
 

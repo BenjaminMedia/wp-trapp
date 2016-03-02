@@ -18,7 +18,7 @@ class Main
         add_action('bp_pll_init', [__CLASS__, 'bpPllInit']);
         add_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
         add_action('before_delete_post', [__CLASS__, 'deletePost']);
-        add_action('load-post.php', [__CLASS__, 'loadPost']);;
+        add_action('load-post.php', [__CLASS__, 'loadPost']);
 
         // Hook into plugin actions
         add_action('bp_save_trapp', [__CLASS__, 'saveTrapp'], 10, 2);
@@ -46,6 +46,7 @@ class Main
         add_action('bp_trapp_after_save_post', [__CLASS__, 'polylangCreateLanguages'], 10, 2);
         add_action('bp_after_delete_trapp', [__CLASS__, 'polylangDeleteTrapp']);
         add_filter('bp_trapp_save_language_post_args', [__CLASS__, 'saveLanguagePostArgs'], 10, 2);
+        add_action('admin_init', [__CLASS__, 'pll_post_columns']);
     }
 
     /**
@@ -179,6 +180,11 @@ class Main
     {
         $events = new Polylang\Events($row, $post);
         $events->saveLanguages();
+    }
+
+    public static function pll_post_columns() {
+        $pll_columns = new Polylang\Columns();
+        $pll_columns->registerColumns();
     }
 
     /**

@@ -81,8 +81,19 @@ class Mappings
             return false;
         }
 
-        $translationField = new TranslationField($field['label'], $value);
-        $translationField->setGroup($field['group']);
+        if (is_array($value)) {
+            $translationField = [];
+
+            foreach ($value as $key => $singleValue) {
+                $translationSingleField = new TranslationField($key, $singleValue);
+                $translationSingleField->setGroup($field['group']);
+
+                $translationField[] = $translationSingleField;
+            }
+        } else {
+            $translationField = new TranslationField($field['label'], $value);
+            $translationField->setGroup($field['group']);
+        }
 
         return $translationField;
     }
