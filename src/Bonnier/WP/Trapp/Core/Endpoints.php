@@ -104,9 +104,13 @@ class Endpoints extends WP_REST_Controller
         $groupFields = $fieldGroups[$updateGroup]['fields'];
 
         foreach ($groupFields as $groupField) {
+
             if ($groupField['label'] == $label) {
                 $updateField = $groupField;
                 break;
+            } elseif ($group == $groupField['label']) {
+                $updateField = $groupField;
+                $updateField['args']['array_key'] = $label;
             }
         }
 
