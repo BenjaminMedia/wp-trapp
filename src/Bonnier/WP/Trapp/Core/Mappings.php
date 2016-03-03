@@ -74,7 +74,7 @@ class Mappings
         return apply_filters('bp_trapp_default_fields', $defaultFields);
     }
 
-    public static function translationField($field, $postId, $post) {
+    public static function translationField($field, $postId, $post, $arrayIgnore = []) {
         $value = self::getValue($field['type'], $postId, $post, $field['args']);
 
         if (!$value) {
@@ -85,6 +85,10 @@ class Mappings
             $translationField = [];
 
             foreach ($value as $key => $singleValue) {
+                if (in_array($key, $arrayIgnore)) {
+                    continue;
+                }
+
                 $translationSingleField = new TranslationField($key, $singleValue);
                 $translationSingleField->setGroup($field['group']);
 
