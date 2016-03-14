@@ -16,7 +16,7 @@ class Main
         // Register own actions
         add_action('pll_init', [__CLASS__, 'polylangInit']);
         add_action('bp_pll_init', [__CLASS__, 'bpPllInit']);
-        add_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
+        add_action('save_post', [__CLASS__, 'editSavePost'], 999, 2); // Save late
         add_action('before_delete_post', [__CLASS__, 'deletePost']);
         add_action('load-post.php', [__CLASS__, 'loadPost']);
 
@@ -47,22 +47,23 @@ class Main
         add_action('bp_after_delete_trapp', [__CLASS__, 'polylangDeleteTrapp']);
         add_filter('bp_trapp_save_language_post_args', [__CLASS__, 'saveLanguagePostArgs'], 10, 2);
         add_action('admin_init', [__CLASS__, 'pll_post_columns']);
+        add_action('pll_get_new_post_translation_link', '__return_false');
     }
 
     /**
-     * Hook listener for edit_post.
+     * Hook listener for save_post.
      *
      * @param int $postId Post id of the edited post.
      *
      * @return void.
      */
-    public static function editPost($postId, $post)
+    public static function editSavePost($postId, $post)
     {
         // To avoid infinite loops
-        remove_action('edit_post', [__CLASS__, 'editPost'], 10, 2);
+        remove_action('save_post', [__CLASS__, 'editSavePost'], 999, 2); // Save late
 
         $events = new Post\Events($postId, $post);
-        $events->editPost();
+        $events->editSavePost();
     }
 
     public static function loadPost() {

@@ -70,7 +70,7 @@ class Events
      *
      * @return void.
      */
-    public function editPost()
+    public function editSavePost()
     {
         if (!isset($_POST['send_to_trapp'])) {
             return;
@@ -307,6 +307,7 @@ class Events
         }
 
         $newFields = [];
+        $arrayIgnore = [];
         $serviceFields = $service->getFields();
         $fieldGroups = Mappings::getFields(get_post_type($this->post));
 
@@ -315,6 +316,7 @@ class Events
                 $field['group'] = $fieldGroup['title'];
 
                 foreach ($serviceFields as $fieldId => $serviceField) {
+
                     if ($field['label'] == $serviceField->getLabel()) {
                         $value = Mappings::getValue($field['type'], $this->postId, $this->post, $field['args']);
 
@@ -323,6 +325,14 @@ class Events
                         }
 
                         continue 2;
+                    } elseif ($field['type'] == 'post_meta_array') {
+                        $value = Mappings::getValue($field['type'], $this->postId, $this->post, $field['args']);
+                        $label = $serviceField->getLabel();
+
+                        if (array_key_exists($label, $value)) {
+                            $serviceFields[$fieldId]->setValue($value[$label]);
+                            $arrayIgnore[] = $label;
+                        }
                     }
                 }
 
@@ -334,7 +344,7 @@ class Events
 
         if (!empty($newFields)) {
             foreach ($newFields as $newField) {
-                $field = Mappings::translationField($newField, $this->postId, $this->post);
+                $field = Mappings::translationField($newField, $this->postId, $this->post, $arrayIgnore);
 
                 if ( ! empty( $field ) ) {
                     if (is_array($field)) {
