@@ -70,7 +70,7 @@ class Events
      *
      * @return void.
      */
-    public function editPost()
+    public function editSavePost()
     {
         if (!isset($_POST['send_to_trapp'])) {
             return;
