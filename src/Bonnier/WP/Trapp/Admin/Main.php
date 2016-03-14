@@ -47,6 +47,7 @@ class Main
         add_action('bp_after_delete_trapp', [__CLASS__, 'polylangDeleteTrapp']);
         add_filter('bp_trapp_save_language_post_args', [__CLASS__, 'saveLanguagePostArgs'], 10, 2);
         add_action('admin_init', [__CLASS__, 'pll_post_columns']);
+        add_action('pll_get_new_post_translation_link', '__return_false');
     }
 
     /**
