@@ -6,6 +6,7 @@ use Bonnier\WP\Trapp\Plugin;
 use Bonnier\WP\Trapp\Core\Endpoints;
 use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Core\ServiceTranslation;
+use Bonnier\ServiceException;
 use Bonnier\Trapp\Translation\TranslationRevision;
 use Bonnier\Trapp\Translation\TranslationField;
 use DateTime;
@@ -125,19 +126,33 @@ class Events
         }
 
         $service = new ServiceTranslation;
-        $service = $service->getById($this->trappId);
-        $service->delete();
 
-        $row = $service->getRow();
+        try {
+            $service = $service->getById($this->trappId);
+            $service->delete();
 
-        /**
-         * Fired once a post with a TRAPP id has been deleted.
-         *
-         * @param int    $postId  Post ID.
-         * @param object $post WP_Post object of the deleted post.
-         * @param array  $row  Returned row from the Trapp request.
-         */
-        do_action('bp_after_delete_trapp', $this->postId, $this->post, $row);
+            $row = $service->getRow();
+
+            /**
+             * Fired once a post with a TRAPP id has been deleted.
+             *
+             * @param int    $postId  Post ID.
+             * @param object $post WP_Post object of the deleted post.
+             * @param array  $row  Returned row from the Trapp request.
+             */
+            do_action('bp_after_delete_trapp', $this->postId, $this->post, $row);
+
+        } catch (ServiceException $e) {
+            /**
+             * Fired once a post with a TRAPP id has been deleted and a ServiceException has been returned.
+             *
+             * @param int    $postId  Post ID.
+             * @param object $post    WP_Post object of the deleted post.
+             * @param object $e       Returned ServiceException.
+             */
+            do_action('bp_after_delete_trapp_exception', $this->postId, $this->post, $e);
+        }
+
     }
 
     /**
