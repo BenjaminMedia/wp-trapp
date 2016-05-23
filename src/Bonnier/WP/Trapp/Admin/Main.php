@@ -220,6 +220,12 @@ class Main
             return;
         }
 
+        $screen = get_current_screen();
+
+        if (! $screen || $screen->base != 'post' ) {
+            return;
+        }
+
         if (empty($_POST['post_lang_choice'])) {
             // We will handle the translations instead of Polylang
             remove_action('save_post', array(Pll()->filters_post, 'save_post'), 21, 3);
