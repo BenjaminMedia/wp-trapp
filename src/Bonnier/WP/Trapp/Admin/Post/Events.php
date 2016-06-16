@@ -129,9 +129,7 @@ class Events
 
         try {
             $service = $service->getById($this->trappId);
-            $service->delete();
-
-            $row = $service->getRow();
+            $row = $service->delete();
 
             /**
              * Fired once a post with a TRAPP id has been deleted.
@@ -281,10 +279,7 @@ class Events
             $service->addTranslatation($locale);
         }
 
-        $service->save();
-
-        // Get row data after data
-        $row = $service->getRow();
+        $row = $service->save();
 
         // Save Trapp ID
         add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
@@ -402,10 +397,7 @@ class Events
             }
         }
 
-        $service->update();
-
-        // Get row data after data
-        $row = $service->getRow();
+        $row = $service->update();
 
         do_action('bp_trapp_after_save_post', $row, $this->post);
     }
