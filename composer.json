@@ -1,0 +1,43 @@
+{
+    "name": "benjaminmedia/wp-trapp",
+    "description": "Send content to the TRAPP translation service.",
+    "type": "wordpress-plugin",
+    "keywords": ["wordpress", "plugin"],
+    "homepage": "https://github.com/BenjaminMedia/wp-trapp",
+    "repositories":[
+        {
+            "type": "composer",
+            "url": "http://wpackagist.org"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Peytz & Co",
+            "email": "wordpress@peytz.dk",
+            "homepage": "http://peytz.dk"
+        },
+        {
+            "name": "Patrick Hesselberg",
+            "email": "phh@peytz.dk",
+            "homepage": "http://peytz.dk/medarbejdere/phh"
+        },
+        {
+            "name": "Rasmus Taarnby",
+            "email": "rt@peytz.dk",
+            "homepage": "http://peytz.dk/medarbejdere/rt"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/BenjaminMedia/wp-trapp/issues",
+        "source": "https://github.com/BenjaminMedia/wp-trapp"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bonnier\\WP\\Trapp\\": "src/Bonnier/WP/Trapp/"
+        }
+    },
+    "require": {
+        "php": ">=5.4",
+        "bonnier/php-sdk": "3.*"
+    }
+}
