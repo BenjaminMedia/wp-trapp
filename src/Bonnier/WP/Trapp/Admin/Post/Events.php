@@ -339,7 +339,7 @@ class Events
                         $value = Mappings::getValue($field['type'], $this->postId, $this->post, $field['args']);
                         $label = $serviceField->getLabel();
 
-                        if (is_array( $value ) && array_key_exists($label, $value)) {
+                        if (is_array($value) && array_key_exists($label, $value)) {
                             $serviceFields[$fieldId]->setValue($value[$label]);
                             $arrayIgnore[] = $label;
                         }

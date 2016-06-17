@@ -49,8 +49,8 @@ class Events
      * @return void.
      */
     public function setRowTranslations()
-    {d($this->row);
-        foreach ($this->row->getRelatedTranslations() as $translation) {ddd($translation);
+    {
+        foreach ($this->row->getRelatedTranslations() as $translation) {
             if ($translation->isOriginal()) {
                 continue;
             }
