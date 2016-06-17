@@ -38,6 +38,6 @@
     },
     "require": {
         "php": ">=5.4",
-        "bonnier/php-sdk": "2.*"
+        "bonnier/php-sdk": "3.*"
     }
 }

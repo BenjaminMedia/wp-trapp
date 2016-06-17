@@ -6,9 +6,9 @@ use Bonnier\WP\Trapp\Plugin;
 use Bonnier\WP\Trapp\Core\Endpoints;
 use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Core\ServiceTranslation;
-use Bonnier\ServiceException;
 use Bonnier\Trapp\Translation\TranslationRevision;
 use Bonnier\Trapp\Translation\TranslationField;
+use GuzzleHttp\Exception\RequestException;
 use DateTime;
 
 class Events
@@ -140,13 +140,13 @@ class Events
              */
             do_action('bp_after_delete_trapp', $this->postId, $this->post, $row);
 
-        } catch (ServiceException $e) {
+        } catch (RequestException $e) {
             /**
-             * Fired once a post with a TRAPP id has been deleted and a ServiceException has been returned.
+             * Fired once a post with a TRAPP id has been deleted and a RequestException has been returned.
              *
              * @param int    $postId  Post ID.
              * @param object $post    WP_Post object of the deleted post.
-             * @param object $e       Returned ServiceException.
+             * @param object $e       Returned RequestException.
              */
             do_action('bp_after_delete_trapp_exception', $this->postId, $this->post, $e);
         }
@@ -282,7 +282,7 @@ class Events
         $row = $service->save();
 
         // Save Trapp ID
-        add_post_meta($this->postId, self::TRAPP_META_KEY, $row->id);
+        add_post_meta($this->postId, self::TRAPP_META_KEY, $row->getId());
 
         // This is the first saved post and therefore master
         add_post_meta($this->postId, self::TRAPP_META_MASTER, 1);
@@ -339,7 +339,7 @@ class Events
                         $value = Mappings::getValue($field['type'], $this->postId, $this->post, $field['args']);
                         $label = $serviceField->getLabel();
 
-                        if (array_key_exists($label, $value)) {
+                        if (is_array($value) && array_key_exists($label, $value)) {
                             $serviceFields[$fieldId]->setValue($value[$label]);
                             $arrayIgnore[] = $label;
                         }
