@@ -6,9 +6,9 @@ use Bonnier\WP\Trapp\Plugin;
 use Bonnier\WP\Trapp\Core\Endpoints;
 use Bonnier\WP\Trapp\Core\Mappings;
 use Bonnier\WP\Trapp\Core\ServiceTranslation;
-use Bonnier\ServiceException;
 use Bonnier\Trapp\Translation\TranslationRevision;
 use Bonnier\Trapp\Translation\TranslationField;
+use GuzzleHttp\Exception\RequestException;
 use DateTime;
 
 class Events
@@ -140,13 +140,13 @@ class Events
              */
             do_action('bp_after_delete_trapp', $this->postId, $this->post, $row);
 
-        } catch (ServiceException $e) {
+        } catch (RequestException $e) {
             /**
-             * Fired once a post with a TRAPP id has been deleted and a ServiceException has been returned.
+             * Fired once a post with a TRAPP id has been deleted and a RequestException has been returned.
              *
              * @param int    $postId  Post ID.
              * @param object $post    WP_Post object of the deleted post.
-             * @param object $e       Returned ServiceException.
+             * @param object $e       Returned RequestException.
              */
             do_action('bp_after_delete_trapp_exception', $this->postId, $this->post, $e);
         }
