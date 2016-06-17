@@ -59,7 +59,7 @@ class Events
 
             $this->rowTranslations[$locale] = [
                 'id' => $translation->getId(),
-                'edit_uri' => $translation['edit_uri']
+                'edit_uri' => $translation->getEditUri(),
             ];
         }
     }
