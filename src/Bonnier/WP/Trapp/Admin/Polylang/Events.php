@@ -50,16 +50,16 @@ class Events
      */
     public function setRowTranslations()
     {
-        foreach ($this->row->related_translations as $translation) {
-            if ($translation['is_original']) {
+        foreach ($this->row->getRelatedTranslations() as $translation) {
+            if ($translation->isOriginal()) {
                 continue;
             }
 
-            $locale = $translation['locale'];
+            $locale = $translation->getLocale();
 
             $this->rowTranslations[$locale] = [
-                'id' => $translation['id'],
-                'edit_uri' => $translation['edit_uri']
+                'id' => $translation->getId(),
+                'edit_uri' => $translation->getEditUri(),
             ];
         }
     }
