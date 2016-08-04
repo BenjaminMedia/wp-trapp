@@ -69,6 +69,7 @@ class Endpoints extends WP_REST_Controller
             return false;
         }
 
+        $master = $this->getPostByTrappId($request->getOriginalId());
         $fields = $request->getFields();
 
         foreach ($fields as $field) {
@@ -78,6 +79,8 @@ class Endpoints extends WP_REST_Controller
 
             $this->updateField($group, $label, $value, $post);
         }
+
+        do_action('bp_trapp_update_trapp', $post, $master, $request);
 
         update_post_meta($post->ID, self::TRAPP_META_TRANSLATED, 1);
 
