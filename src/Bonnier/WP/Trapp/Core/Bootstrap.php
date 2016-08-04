@@ -30,6 +30,8 @@ class Bootstrap
     public function coreBootstrap()
     {
         add_action('rest_api_init', [__CLASS__, 'registerEndpoints' ] );
+        add_action('pll_init', [__CLASS__, 'polylangInit']);
+        add_action('bp_trapp_core_pll_init', [__CLASS__, 'bpPllInit']);
         add_filter('bp_trapp_service_username', [__CLASS__, 'serviceUser']);
         add_filter('bp_trapp_service_secret', [__CLASS__, 'serviceSecret']);
         add_filter('bp_trapp_service_development', [__CLASS__, 'serviceDevelopment']);
@@ -244,6 +246,51 @@ class Bootstrap
     {
         $endPoints = new Endpoints;
         $endPoints->registerRoutes();
+    }
+
+    /**
+     * Registers bp_pll_init action whenever Polylang has been loaded.
+     *
+     * @return void.
+     */
+    public static function polylangInit()
+    {
+        do_action('bp_trapp_core_pll_init');
+    }
+
+    /**
+     * Registers init hooks whenever Polylang has been loaded.
+     *
+     * @return void.
+     */
+    public static function bpPllInit() {
+        add_action('bp_trapp_update_trapp', [__CLASS__, 'update_trapp_set_status'], 10, 2);
+    }
+
+    /**
+     * Sets the updated Trapp post to the same status as the master.
+     *
+     * @return void.
+     */
+    public static function update_trapp_set_status($post, $master) {
+        $post_status = get_post_status($post);
+        $master_status = get_post_status($master);
+
+        if ($post_status == $master_status) {
+            return;
+        }
+
+        $args = [
+            'ID' => $post->ID,
+            'post_status' => $master_status,
+        ];
+
+        if ($master_status == 'future') {
+            $args['post_date'] = $master->post_date;
+            $args['post_date_gmt'] = $master->post_date_gmt;
+        }
+
+        wp_update_post($args);
     }
 
     /**
