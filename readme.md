@@ -206,6 +206,41 @@ add_filter('bp_trapp_get_mycpt_fields', function($fields) {
         ],
     ];
 });
+
+/**
+ * Extend TRAPP with my image field group.
+ */
+add_filter('bp_trapp_get_mycpt_image_fields', function($fields) {
+    $fields['my_image_field_group'] = [
+        'title' => 'My Image',
+        'fields' => [
+            'display_image' => [
+                'label' => 'My image Url',
+                'args' => [
+                    'image_key' => 'mifg_image',
+                ],
+                'type' => 'image_display',
+                'display_format' => 'image',
+            ],
+            'title' => [
+                'label' => 'My image Title',
+                'args' => [
+                    'image_key' => 'mifg_image',
+                    'key' => 'post_title'
+                ],
+                'type' => 'image_wp_post',
+            ],
+            'alt' => [
+                'label' => 'My image Alt',
+                'args' => [
+                    'image_key' => 'mifg_image',
+                    'key' => '_wp_attachment_image_alt'
+                ],
+                'type' => 'image_post_meta',
+            ],
+        ],
+    ];
+});
 ```
 
 `bp_trapp_save_images`
