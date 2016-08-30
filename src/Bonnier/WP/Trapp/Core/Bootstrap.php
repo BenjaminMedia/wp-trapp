@@ -43,6 +43,7 @@ class Bootstrap
         add_filter('bp_trapp_update_post_meta_value', [__CLASS__, 'filterUpdatePostMeta'], 10, 4);
         add_filter('bp_trapp_get_post_meta_array_value', [__CLASS__, 'filterGetPostMetaArray'], 10, 4);
         add_filter('bp_trapp_update_post_meta_array_value', [__CLASS__, 'filterUpdatePostMetaArray'], 10, 4);
+        add_filter('bp_trapp_get_image_display_value', [__CLASS__, 'filterGetImageDisplay'], 10, 4);
         add_filter('bp_trapp_get_image_wp_post_value', [__CLASS__, 'filterGetImageWpPost'], 10, 4);
         add_filter('bp_trapp_update_image_wp_post_value', [__CLASS__, 'filterUpdateImageWpPost'], 10, 4);
         add_filter('bp_trapp_get_image_post_meta_value', [__CLASS__, 'filterGetImagePostMeta'], 10, 4);
@@ -145,6 +146,26 @@ class Bootstrap
         $update = update_post_meta($post->ID, $args['key'], $values);
 
         return $update;
+    }
+
+    public static function filterGetImageDisplay($value, $postId, $post, $args) {
+        if (!array_key_exists('image_key', $args) ) {
+            return $value;
+        }
+
+        $imageId = get_post_meta($postId, $args['image_key'], true);
+
+        if (!$imageId) {
+            return $value;
+        }
+
+        $image = get_post($imageId);
+
+        if (!$image) {
+            return $value;
+        }
+
+        return wp_get_attachment_image_url($imageId, 'full');
     }
 
     public static function filterGetImageWpPost($value, $postId, $post, $args)

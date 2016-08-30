@@ -51,6 +51,14 @@ class Mappings
             'post_thumbnail' => [
                 'title' => 'Post Thumbnail',
                 'fields' => [
+                    'display_image' => [
+                        'label' => 'Post Thumbnail Url',
+                        'args' => [
+                            'image_key' => '_thumbnail_id',
+                        ],
+                        'type' => 'image_display',
+                        'display_format' => 'image',
+                    ],
                     'title' => [
                         'label' => 'Post Thumbnail Title',
                         'args' => [
@@ -97,6 +105,10 @@ class Mappings
         } else {
             $translationField = new TranslationField($field['label'], $value);
             $translationField->setGroup($field['group']);
+
+            if (!empty($field['display_format'])) {
+                $translationField->setDisplayFormat($field['display_format']);
+            }
         }
 
         return $translationField;

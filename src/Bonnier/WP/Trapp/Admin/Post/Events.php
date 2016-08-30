@@ -356,7 +356,7 @@ class Events
             foreach ($newFields as $newField) {
                 $field = Mappings::translationField($newField, $this->postId, $this->post, $arrayIgnore);
 
-                if ( ! empty( $field ) ) {
+                if (!empty($field)) {
                     if (is_array($field)) {
                         foreach ($field as $singleField) {
                             $service->addField($singleField);
