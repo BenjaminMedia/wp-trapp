@@ -112,7 +112,7 @@ class Events
 
         foreach ($terms as $term) {
             if ($translation = Pll()->model->term->get_translation($term->term_id, $languageSlug)) {
-                wp_set_post_terms($translationId, $translation, $term->taxonomy, true);
+                wp_set_post_terms($translationId, $translation, $term->taxonomy);
             }
         }
     }
