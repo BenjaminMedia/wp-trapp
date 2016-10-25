@@ -286,6 +286,7 @@ class Bootstrap
      */
     public static function bpPllInit() {
         add_action('bp_trapp_update_trapp', [__CLASS__, 'update_trapp_set_status'], 10, 2);
+        add_action('save_post', [__CLASS__, 'clear_post_filters_links_cache']);
     }
 
     /**
@@ -312,6 +313,14 @@ class Bootstrap
         }
 
         wp_update_post($args);
+    }
+
+    /**
+     * Avoid post link cache when a link is updated - See PLL_Frontend_Filters_Links::post_type_link
+     */
+    public static function clear_post_filters_links_cache($postId) {
+        $cacheKey = 'post:' . $postId;
+        Pll()->filters_links->cache->clean($cacheKey);
     }
 
     /**
