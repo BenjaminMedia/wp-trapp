@@ -319,8 +319,10 @@ class Bootstrap
      * Avoid post link cache when a link is updated - See PLL_Frontend_Filters_Links::post_type_link
      */
     public static function clear_post_filters_links_cache($postId) {
-        $cacheKey = 'post:' . $postId;
-        Pll()->filters_links->cache->clean($cacheKey);
+        if (!is_admin()) {
+            $cacheKey = 'post:' . $postId;
+            Pll()->filters_links->cache->clean($cacheKey);
+        }
     }
 
     /**
